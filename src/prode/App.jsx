@@ -5,6 +5,9 @@ import { useWeb3React } from '@web3-react/core'
 import { InjectedConnector } from '@web3-react/injected-connector'
 import Web3U from 'web3-utils'
 
+import { Contract } from "@ethersproject/contracts";
+import Wager from '../contracts/Wager.json'
+
 /* S: Web3 API **********************************************/
 /* TODO: Move to another file *******************************/
 
@@ -89,6 +92,15 @@ export const Wallet = () => {
 		console.log('checkBalance')
 	}
 
+	const interactWithContract = async () => {
+		console.log('interactWithContract')
+		const contract = new Contract('0xCfEB869F69431e42cdB54A4F4f105C19C080A601', Wager.abi, library.getSigner())
+		window.contract = contract
+
+		const overrides = { value: Web3U.toWei('1.0', 'ether') }
+		await contract.placeBet(0, overrides)
+	}
+
   return (
     <div>
       <div>ChainId: {chainId}</div>
@@ -98,6 +110,7 @@ export const Wallet = () => {
 				<div>
 					<div>Activo</div>
 					<button onClick={checkBalance}>Check Balance</button>
+					<button onClick={interactWithContract}>Interact with contract</button>
 				</div>
       ) : (
         <button type="button" onClick={onClick}>
@@ -210,10 +223,12 @@ export const App = () => {
 			<div>
 				<button onClick={submitBoard}>Submit</button>
 			</div>
+			<div>
+				<Web3ReactProvider getLibrary={getLibrary}>
+					<Wallet />
+				</Web3ReactProvider>
+			</div>
 		</div>
-    //<Web3ReactProvider getLibrary={getLibrary}>
-      //<Wallet />
-    //</Web3ReactProvider>
   )
 }
 
