@@ -22,12 +22,6 @@ export const injectedConnector = new InjectedConnector({
   ],
 })
 
-function getLibrary(provider){
-  const library = new Web3Provider(provider)
-  library.pollingInterval = 12000
-  return library
-}
-
 /* S: Board API *********************************************/
 /* TODO: Move to another file *******************************/
 
@@ -73,50 +67,50 @@ function CheckBoard(board) {
 	return valid
 }
 
+async function SubmitBoard(board, library) {
+	const contract = new Contract('0xCfEB869F69431e42cdB54A4F4f105C19C080A601', Wager.abi, library.getSigner()) //TODO: Get address as a parameter
+
+	const bets = []
+	const doubles = []
+	for (let row in board) {
+		for (let col = 0; col < 3; col++) {
+			if (board[row][col] == 'X') { //A: Set outcome //TODO: This could be an in extra col that we don't show
+				bets.push(col)
+			}
+		}
+		
+		if (board[row][3] == 'X') { //A: They marked it as a double
+			doubles.push(row)
+		}
+	}
+
+	while (doubles.length < 2) { //A: Doubles has to be of size = 2
+		doubles.push(13) //A: Since there's 13 games, this index is out of range
+	}
+
+	console.log('Placing bet', bets, doubles)
+
+	const overrides = { value: Web3U.toWei('1.0', 'ether') }
+	await contract.placeBet(bets, doubles, overrides)
+}
+
 /* S: UI ****************************************************/
 
 export const Wallet = () => {
   const { chainId, account, activate, active, library } = useWeb3React()
 	const [ balance, setBalance ] = useState()
 
-	window.web3 = useWeb3React()
-	window.web3u = Web3U
-
   const onClick = () => {
     activate(injectedConnector)
   }
 
-	const checkBalance = () => {
-		const provider = new Web3Provider(library.provider)
-		provider.getBalance(account).then(x => setBalance(Web3U.fromWei(x.toString(), 'ether')))
-		console.log('checkBalance')
-	}
-
-	const interactWithContract = async () => {
-		console.log('interactWithContract')
-		const contract = new Contract('0xCfEB869F69431e42cdB54A4F4f105C19C080A601', Wager.abi, library.getSigner())
-		window.contract = contract
-
-		const overrides = { value: Web3U.toWei('1.0', 'ether') }
-		await contract.placeBet(0, overrides)
-	}
-
   return (
     <div>
-      <div>ChainId: {chainId}</div>
-      <div>Account: {account}</div>
-			<div>Balance: {balance}</div>
-      {active ? (
-				<div>
-					<div>Activo</div>
-					<button onClick={checkBalance}>Check Balance</button>
-					<button onClick={interactWithContract}>Interact with contract</button>
-				</div>
-      ) : (
-        <button type="button" onClick={onClick}>
-          Connect
-        </button>
-      )}
+			{active ? 
+				(<div>Account: {account}</div>)
+				:
+				(<button onClick={onClickActivate}>Activate</button>)
+			}
     </div>
   )
 }
@@ -189,12 +183,13 @@ function Board({ board, onClickSquare }) {
 	)
 }
 
-export const App = () => {
+function Prode() {
+  const { chainId, account, activate, active, library } = useWeb3React()
+
 	const boardInitial = [] 
 	for (let row = 0; row < 13; row++) {
 		boardInitial.push(['_', '_', '_', '_'])
 	}
-
 	const [board, setBoard] = useState(boardInitial)
 
 	const onClickSquare = (row, col) => {
@@ -207,14 +202,18 @@ export const App = () => {
 
 		if (CheckBoard(board)) {
 			console.log('submitBoard submitting')
-			//TODO: Interact with smart contract
+			SubmitBoard(board, library);
 		} else {
 			console.log('submitBoard invalid')
 			//TODO: Paint red the missing games/extra doubles
 		}
 	}
 
-  return (
+  const onClickActivate = () => {
+    activate(injectedConnector)
+	}
+
+	return (
 		<div>
 			<h1>Prode</h1>
 			<div style={{display:"inline-block", border:"1px dotted gray", margin:"5px"}}>
@@ -222,14 +221,22 @@ export const App = () => {
 			</div>
 			<div>
 				<button onClick={submitBoard}>Submit</button>
-			</div>
-			<div>
-				<Web3ReactProvider getLibrary={getLibrary}>
-					<Wallet />
-				</Web3ReactProvider>
+				<button onClick={onClickActivate}>Activate</button>
 			</div>
 		</div>
-  )
+	)
 }
 
-export default App
+function getLibrary (provider) {
+	const library = new Web3Provider(provider)
+	library.pollingInterval = 12000
+	return library
+}
+
+export default function App() {
+  return (
+		<Web3ReactProvider getLibrary={getLibrary}>
+			<Prode />
+		</Web3ReactProvider>
+  )
+}
