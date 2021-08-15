@@ -13,7 +13,7 @@
 * web3-react necesita tener esto instalado
 
 ~~~
-sudo pnpm i -g node-gyp
+sudo npm i -g node-gyp
 sudo apt-get install libusb-1.0-0-dev
 ~~~
 
