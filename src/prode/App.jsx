@@ -5,7 +5,7 @@ import { useWeb3React } from '@web3-react/core'
 import { InjectedConnector } from '@web3-react/injected-connector'
 import Web3U from 'web3-utils'
 
-import { Contract } from "@ethersproject/contracts";
+import { Contract, ContractFactory } from "@ethersproject/contracts";
 import Wager from '../contracts/Wager.json'
 
 /* S: Web3 API **********************************************/
@@ -69,6 +69,7 @@ function CheckBoard(board) {
 
 async function SubmitBoard(board, library) {
 	const contract = new Contract('0xCfEB869F69431e42cdB54A4F4f105C19C080A601', Wager.abi, library.getSigner()) //TODO: Get address as a parameter
+	//window.contract = contract //A: Test
 
 	const bets = []
 	const doubles = []
@@ -94,26 +95,7 @@ async function SubmitBoard(board, library) {
 	await contract.placeBet(bets, doubles, overrides)
 }
 
-/* S: UI ****************************************************/
-
-export const Wallet = () => {
-  const { chainId, account, activate, active, library } = useWeb3React()
-	const [ balance, setBalance ] = useState()
-
-  const onClick = () => {
-    activate(injectedConnector)
-  }
-
-  return (
-    <div>
-			{active ? 
-				(<div>Account: {account}</div>)
-				:
-				(<button onClick={onClickActivate}>Activate</button>)
-			}
-    </div>
-  )
-}
+/* S: Betting UI ********************************************/
 
 function Square({ state, onClick }) {
 	return (
@@ -183,9 +165,7 @@ function Board({ board, onClickSquare }) {
 	)
 }
 
-function Prode() {
-  const { chainId, account, activate, active, library } = useWeb3React()
-
+function Bettor({ library, address }) {
 	const boardInitial = [] 
 	for (let row = 0; row < 13; row++) {
 		boardInitial.push(['_', '_', '_', '_'])
@@ -209,34 +189,101 @@ function Prode() {
 		}
 	}
 
-  const onClickActivate = () => {
-    activate(injectedConnector)
-	}
-
 	return (
 		<div>
-			<h1>Prode</h1>
+			<h1>Bettor</h1>
 			<div style={{display:"inline-block", border:"1px dotted gray", margin:"5px"}}>
 				<Board board={board} onClickSquare={onClickSquare}/>
 			</div>
 			<div>
 				<button onClick={submitBoard}>Submit</button>
-				<button onClick={onClickActivate}>Activate</button>
 			</div>
 		</div>
 	)
 }
 
-function getLibrary (provider) {
-	const library = new Web3Provider(provider)
-	library.pollingInterval = 12000
-	return library
+/* S: Bet setup UI ******************************************/
+/* TODO: Move to another file *******************************/
+
+function Creator({ library }) { //U: UI to setup bets
+	const [address, setAddress] = useState(undefined)
+
+	const onClickCreate = async () => {
+		const factory = new ContractFactory(Wager.abi, Wager.bytecode, library.getSigner())
+		const contract = await factory.deploy()
+
+		contract.deployTransaction.wait().then( //A: Wait until it's been deployed
+			() => setAddress(contract.address)
+		)
+	}
+
+	return (
+		<div>
+			<h1>Creator</h1>
+			{
+				address ? (<div>Contract Address: {address}</div>)
+				:(<button onClick={onClickCreate}>Create</button>)
+			}
+		</div>
+	)
+}
+
+/* S: UI Manager ********************************************/
+
+function MiddlePerson() { //U: Needed for activate to work
+  const { chainId, account, activate, active, library } = useWeb3React()
+	const [address, setAddress] = useState(undefined)
+	const [mode, setMode] = useState('bettor')
+
+  const onClickActivate = () => {
+    activate(injectedConnector)
+	}
+
+	const changeMode = () => {
+		setMode(mode == 'creator' ? 'bettor' : 'creator')
+	}
+
+	if (active) { //A: Let them bet
+		//TODO: Ask them for the address
+		return (
+			<div>
+				{mode == 'creator' ? (
+					<div>
+						<Creator library={library} />
+					</div>
+				) : (
+					<div>
+						<Bettor library={library} />
+					</div>
+				)}
+				<br />
+				<div>
+					<div>Account: {account}</div>
+					<div>
+						<button onClick={changeMode}>Change Role</button>
+					</div>
+				</div>
+			</div>
+		)
+	} else { //A: Ask them to log in
+		return (
+			<div>
+				<button onClick={onClickActivate}>Activate</button>
+			</div>
+		)
+	}
 }
 
 export default function App() {
+	const getLibrary = (provider) => {
+		const library = new Web3Provider(provider)
+		library.pollingInterval = 12000
+		return library
+	}
+
   return (
 		<Web3ReactProvider getLibrary={getLibrary}>
-			<Prode />
+			<MiddlePerson />
 		</Web3ReactProvider>
   )
 }
