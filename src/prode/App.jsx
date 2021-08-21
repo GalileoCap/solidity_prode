@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+//import { TextInput } from 'react-native'
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
@@ -67,10 +68,7 @@ function CheckBoard(board) {
 	return valid
 }
 
-async function SubmitBoard(board, library) {
-	const contract = new Contract('0xCfEB869F69431e42cdB54A4F4f105C19C080A601', Wager.abi, library.getSigner()) //TODO: Get address as a parameter
-	//window.contract = contract //A: Test
-
+async function SubmitBoard(board, contract) {
 	const bets = []
 	const doubles = []
 	for (let row in board) {
@@ -94,6 +92,51 @@ async function SubmitBoard(board, library) {
 	const overrides = { value: Web3U.toWei('1.0', 'ether') }
 	await contract.placeBet(bets, doubles, overrides)
 }
+
+function ContractInfo({ account, contract }) { //U: UI With a contract's info
+	const [info, setInfo] = useState({
+		chairperson: '', //A: Owner of the contract
+		owner: false, //A: Are you the owner?
+		started: false, //A: Have the games started?
+		done: false, //A: Are the games done?
+		totalPool: 0, //A: How much money people have bet
+		games: Array(13).fill([0, 0, 0]), //A: How many people have bet for each outcome of each game
+	})
+
+	const updateInfo = async () => { //U: Updates the contract's info NOTE: Needed because games updates too many times and ends up crashing React
+		//TODO: It's not working, no idea why. Info is not updating
+		const chairperson = await contract.Chairperson()
+		const owner = chairperson === account
+		const started = await contract.Started()
+		const done = await contract.Done()
+		const totalPool = Web3U.fromWei(await contract.TotalPool(), 'ether')
+
+		const games = Array(13).fill([0, 0, 0]) //A: Dflt
+		for (let i = 0; i < 13; i++) {
+			for (let j = 0; j < 3; j++) {
+				games[i][j] = Web3U.fromWei(await contract.Games(i, j), 'ether')
+			}
+		}
+
+		setInfo({chairperson, owner, started, done, totalPool, games})
+	}
+	updateInfo()
+
+	return (
+		<div>
+			<h2>Contract Info</h2>
+			<div>Owner: {info.chairperson}</div>
+			<div>Owned by you: {info.owner.toString()}</div>
+			<div>Address: {contract.address}</div>
+			<div>Started: {info.started.toString()}</div>
+			<div>Done: {info.done.toString()}</div>
+			<div>Total Pool: {info.totalPool}</div>
+			<div>Games: {info.games.join('; ')}</div>
+		</div>
+	)
+}
+
+
 
 /* S: Betting UI ********************************************/
 
@@ -160,12 +203,28 @@ function Board({ board, onClickSquare }) {
 
 	return(
 		<div>
-			{boardToComponent()}
+			<h2>Board</h2>
+			<div style={{display:"inline-block", border:"1px dotted gray", margin:"5px"}}>
+				{boardToComponent()}
+			</div>
 		</div>
 	)
 }
 
-function Bettor({ library, address }) {
+function Bettor({ library }) {
+	const [contract, setContract] = useState(undefined)
+	const [address, setAddress] = useState('') 
+
+	const inputAddress = (e) => {
+		setAddress(e.target.value)
+	}
+
+	const inputContract = () => {
+		//TODO: Check if address is valid
+		const newContract = new Contract(address, Wager.abi, library.getSigner())
+		setContract(newContract)
+	}
+
 	const boardInitial = [] 
 	for (let row = 0; row < 13; row++) {
 		boardInitial.push(['_', '_', '_', '_'])
@@ -182,7 +241,7 @@ function Bettor({ library, address }) {
 
 		if (CheckBoard(board)) {
 			console.log('submitBoard submitting')
-			SubmitBoard(board, library);
+			SubmitBoard(board, contract);
 		} else {
 			console.log('submitBoard invalid')
 			//TODO: Paint red the missing games/extra doubles
@@ -192,38 +251,69 @@ function Bettor({ library, address }) {
 	return (
 		<div>
 			<h1>Bettor</h1>
-			<div style={{display:"inline-block", border:"1px dotted gray", margin:"5px"}}>
-				<Board board={board} onClickSquare={onClickSquare}/>
-			</div>
-			<div>
-				<button onClick={submitBoard}>Submit</button>
-			</div>
+			{contract ? (
+				<div>
+					<ContractInfo contract={contract} />
+					<Board board={board} onClickSquare={onClickSquare}/>
+					<br/><button onClick={submitBoard}>Submit</button>
+				</div>
+			) : (
+				<div>
+					Input contract address:
+					<br/><input type="text" value={address} onChange={inputAddress} />
+					<br/><button onClick={inputContract}>Send</button>
+				</div>
+			)}
 		</div>
 	)
 }
 
-/* S: Bet setup UI ******************************************/
+/* S: Bet setup & management UI *****************************/
 /* TODO: Move to another file *******************************/
 
-function Creator({ library }) { //U: UI to setup bets
-	const [address, setAddress] = useState(undefined)
+function Creator({ account, library }) { //U: UI to setup bets
+	const [contract, setContract] = useState(undefined)
+	const [address, setAddress] = useState('')
+
+	const inputAddress = (e) => {
+		setAddress(e.target.value)
+	}
+
+	const inputContract = () => {
+		//TODO: Check if address is valid
+		const newContract = new Contract(address, Wager.abi, library.getSigner())
+		setContract(newContract)
+	}
 
 	const onClickCreate = async () => {
 		const factory = new ContractFactory(Wager.abi, Wager.bytecode, library.getSigner())
 		const contract = await factory.deploy()
 
 		contract.deployTransaction.wait().then( //A: Wait until it's been deployed
-			() => setAddress(contract.address)
+			() => setContract(contract)
 		)
 	}
-
+	
 	return (
 		<div>
 			<h1>Creator</h1>
-			{
-				address ? (<div>Contract Address: {address}</div>)
-				:(<button onClick={onClickCreate}>Create</button>)
-			}
+			{contract ? (
+					<div>
+					<ContractInfo account={account} contract={contract} />
+					</div>
+				) :	(
+				<div>
+					<div>
+						Input contract address:
+						<br/><input type="text" value={address} onChange={inputAddress} />
+						<br/><button onClick={inputContract}>Send</button>
+					</div>
+					<div>
+						Create new contract
+						<br/><button onClick={onClickCreate}>Create</button>
+					</div>
+				</div>
+			)}
 		</div>
 	)
 }
@@ -232,7 +322,6 @@ function Creator({ library }) { //U: UI to setup bets
 
 function MiddlePerson() { //U: Needed for activate to work
   const { chainId, account, activate, active, library } = useWeb3React()
-	const [address, setAddress] = useState(undefined)
 	const [mode, setMode] = useState('bettor')
 
   const onClickActivate = () => {
@@ -244,12 +333,11 @@ function MiddlePerson() { //U: Needed for activate to work
 	}
 
 	if (active) { //A: Let them bet
-		//TODO: Ask them for the address
 		return (
 			<div>
 				{mode == 'creator' ? (
 					<div>
-						<Creator library={library} />
+						<Creator account={account} library={library} />
 					</div>
 				) : (
 					<div>
@@ -268,6 +356,7 @@ function MiddlePerson() { //U: Needed for activate to work
 	} else { //A: Ask them to log in
 		return (
 			<div>
+				<h1>Wallet activation required</h1>
 				<button onClick={onClickActivate}>Activate</button>
 			</div>
 		)
