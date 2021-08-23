@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 //import { TextInput } from 'react-native'
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
@@ -8,6 +8,28 @@ import Web3U from 'web3-utils'
 
 import { Contract, ContractFactory } from "@ethersproject/contracts";
 import Wager from '../contracts/Wager.json'
+
+/* S: Utils *************************************************/
+/* TODO: Mover a otro archivo *******************************/
+
+async function conseguirVarios(comoConseguir, cartelParaLog = '') { //U: Recibe un diccionario de las claves y la funcion que consigue su valor. Y espera a que se cumplan todas las promesas
+	const valores = {}
+	const promesas = Object.entries(comoConseguir).map(async ([key, func]) => {
+		valores[key] = 'buscando'
+		try {
+			valores[key] = await func()
+		} catch (err) {
+			console.error(cartelParaLog + ' conseguirVarios error consiguiendo', key, err)
+			valores[key] = 'fallo'
+		}
+		return valores[key] //A: Para que devuelva una promesa
+	})
+	await Promise.all(promesas)
+	console.log(cartelParaLog + ' conseguirVarios', valores)
+	
+	return valores
+}
+
 
 /* S: Web3 API **********************************************/
 /* TODO: Move to another file *******************************/
@@ -96,7 +118,7 @@ async function SubmitBoard(board, contract) {
 function ContractInfo({ account, contract }) { //U: UI With a contract's info
 	const [info, setInfo] = useState({
 		chairperson: '', //A: Owner of the contract
-		owner: false, //A: Are you the owner?
+		isOwner: false, //A: Are you the owner?
 		started: false, //A: Have the games started?
 		done: false, //A: Are the games done?
 		totalPool: 0, //A: How much money people have bet
@@ -104,28 +126,40 @@ function ContractInfo({ account, contract }) { //U: UI With a contract's info
 	})
 
 	const updateInfo = async () => { //U: Updates the contract's info NOTE: Needed because the promises cause React to update too many times and it crashes
-		//TODO: It's not working, no idea why. Info is not updating
-		const chairperson = await contract.Chairperson()
-		const owner = chairperson === account
-		const started = await contract.Started()
-		const done = await contract.Done()
-		const totalPool = Web3U.fromWei(await contract.TotalPool(), 'ether')
-
-		const games = Array(13).fill([0, 0, 0]) //A: Dflt
-		for (let i = 0; i < 13; i++) {
-			for (let j = 0; j < 3; j++) {
-				games[i][j] = Web3U.fromWei(await contract.Games(i, j), 'ether')
-			}
+		const comoConseguir = {
+			chairperson : async () => (await contract.Chairperson()),
+			isOwner : async () => ('no se'),
+			started : async () => (await contract.Started()),
+			done : async () => (await contract.Done()),
+			totalPool : async () => (Web3U.fromWei((await contract.TotalPool())._hex, 'ether')), //A: ._hex because of a bug in how Web3U checks if it's a BigNumber
+			games :
+				async () => {
+					const games = Array(13).fill([0, 0, 0]) //A: Dflt
+					for (let i = 0; i < 13; i++) {
+						for (let j = 0; j < 3; j++) {
+							games[i][j] = await contract.Games(i, j)
+						}
+					}
+					return games
+				}
 		}
 
-		setInfo({chairperson, owner, started, done, totalPool, games})
+		const newInfo = await conseguirVarios(comoConseguir, 'updateInfo')
+		newInfo.isOwner = newInfo.chairperson != 'fallo' && newInfo.chairperson === account
+		setInfo(newInfo)
+		console.log('updateInfo done', newInfo)
 	}
+
+	useEffect(
+		() => { updateInfo() }, //A: useEffect espera una funcion que devuelve null u otra funcion para llamar cuando no se muestra mas el componente
+		[account, contract] //A: Depende de cuando cambian account o contract
+	)
 
 	return (
 		<div>
 			<h2>Contract Info</h2>
 			<div>Owner: {info.chairperson}</div>
-			<div>Owned by you: {info.owner.toString()}</div>
+			<div>Owned by you: {info.isOwner.toString()}</div>
 			<div>Address: {contract.address}</div>
 			<div>Started: {info.started.toString()}</div>
 			<div>Done: {info.done.toString()}</div>
@@ -211,7 +245,7 @@ function Board({ board, onClickSquare }) {
 	)
 }
 
-function Bettor({ library }) {
+function Bettor({ account, library }) {
 	const [contract, setContract] = useState(undefined)
 	const [address, setAddress] = useState('') 
 
@@ -253,7 +287,7 @@ function Bettor({ library }) {
 			<h1>Bettor</h1>
 			{contract ? (
 				<div>
-					<ContractInfo contract={contract} />
+					<ContractInfo account={account} contract={contract} />
 					<Board board={board} onClickSquare={onClickSquare}/>
 					<br/><button onClick={submitBoard}>Submit</button>
 				</div>
@@ -355,7 +389,7 @@ function MiddlePerson() { //U: Needed for activate to work
 					</div>
 				) : (
 					<div>
-						<Bettor library={library} />
+						<Bettor account={account} library={library} />
 					</div>
 				)}
 				<br />
