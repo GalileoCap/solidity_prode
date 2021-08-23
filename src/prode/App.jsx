@@ -103,7 +103,7 @@ function ContractInfo({ account, contract }) { //U: UI With a contract's info
 		games: Array(13).fill([0, 0, 0]), //A: How many people have bet for each outcome of each game
 	})
 
-	const updateInfo = async () => { //U: Updates the contract's info NOTE: Needed because games updates too many times and ends up crashing React
+	const updateInfo = async () => { //U: Updates the contract's info NOTE: Needed because the promises cause React to update too many times and it crashes
 		//TODO: It's not working, no idea why. Info is not updating
 		const chairperson = await contract.Chairperson()
 		const owner = chairperson === account
@@ -120,7 +120,6 @@ function ContractInfo({ account, contract }) { //U: UI With a contract's info
 
 		setInfo({chairperson, owner, started, done, totalPool, games})
 	}
-	updateInfo()
 
 	return (
 		<div>
@@ -132,6 +131,7 @@ function ContractInfo({ account, contract }) { //U: UI With a contract's info
 			<div>Done: {info.done.toString()}</div>
 			<div>Total Pool: {info.totalPool}</div>
 			<div>Games: {info.games.join('; ')}</div>
+			<button onClick={updateInfo}>Update</button>
 		</div>
 	)
 }
@@ -293,13 +293,27 @@ function Creator({ account, library }) { //U: UI to setup bets
 			() => setContract(contract)
 		)
 	}
+
+	const onClickStartGames = async () => {
+		await contract.startGames()
+	}
+
+	const onClickInputResults = () => {
+		//TODO: Board to input the results
+	}
+
+	//TODO: Disable buttons if the contract is already marked as started/done/etc
 	
 	return (
 		<div>
 			<h1>Creator</h1>
 			{contract ? (
 					<div>
-					<ContractInfo account={account} contract={contract} />
+						<ContractInfo account={account} contract={contract} />
+						<div>
+							<button onClick={onClickStartGames}>Start Games</button>
+							<br/><button onClick={onClickInputResults}>Input Results</button>
+						</div>
 					</div>
 				) :	(
 				<div>
