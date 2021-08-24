@@ -1,5 +1,6 @@
 //INFO: entrada a la aplicacion, solo cargar estilos, fonts, ...
 import React from "react";
+import 'semantic-ui-css/semantic.min.css'
 import ReactDOM from "react-dom";
 
 import "@fontsource/roboto"; //VER: https://material-ui.com/components/typography/#general

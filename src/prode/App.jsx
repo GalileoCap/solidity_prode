@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-//import { TextInput } from 'react-native'
+import { Button, Input, List, Grid } from 'semantic-ui-react'
+
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
@@ -158,14 +159,33 @@ function ContractInfo({ account, contract }) { //U: UI With a contract's info
 	return (
 		<div>
 			<h2>Contract Info</h2>
-			<div>Owner: {info.chairperson}</div>
-			<div>Owned by you: {info.isOwner.toString()}</div>
-			<div>Address: {contract.address}</div>
-			<div>Started: {info.started.toString()}</div>
-			<div>Done: {info.done.toString()}</div>
-			<div>Total Pool: {info.totalPool}</div>
-			<div>Games: {info.games.join('; ')}</div>
-			<button onClick={updateInfo}>Update</button>
+			<List>
+				<List.Item>
+					<List.Header>Chairperson</List.Header>
+					{info.isOwner ? 'You are the owner' : info.chaiperson}
+				</List.Item>
+				<List.Item>
+					<List.Header>Address</List.Header>
+					{contract.address}
+				</List.Item>
+				<List.Item>
+					<List.Header>Started</List.Header>
+					{info.started.toString()}	
+				</List.Item>
+				<List.Item>
+					<List.Header>Done</List.Header>
+					{info.done.toString()}	
+				</List.Item>
+				<List.Item>
+					<List.Header>TotalPool</List.Header>
+					{info.totalPool}	
+				</List.Item>
+				<List.Item>
+					<List.Header>Games</List.Header>
+					{info.games.join('; ')}	
+				</List.Item>
+			</List>
+			<Button onClick={updateInfo} content='Update' />
 		</div>
 	)
 }
@@ -176,9 +196,9 @@ function ContractInfo({ account, contract }) { //U: UI With a contract's info
 
 function Square({ state, onClick }) {
 	return (
-		<div onClick={onClick} style={{display: 'inline-block', width: '1.5em'}}>
+		<Grid.Column onClick={onClick}>
 			{state}
-		</div>
+		</Grid.Column>
 	)
 }
 
@@ -201,9 +221,9 @@ function Game({ state, row, onClickSquare }) {
 	}
 
 	return (
-		<div>
+		<Grid.Row>
 			{gameToComponent()}
-		</div>
+		</Grid.Row>
 	)
 }
 
@@ -238,9 +258,9 @@ function Board({ board, onClickSquare }) {
 	return(
 		<div>
 			<h2>Board</h2>
-			<div style={{display:"inline-block", border:"1px dotted gray", margin:"5px"}}>
+			<Grid columns={4} divided='vertically'>
 				{boardToComponent()}
-			</div>
+			</Grid>
 		</div>
 	)
 }
@@ -254,9 +274,11 @@ function Bettor({ account, library }) {
 	}
 
 	const inputContract = () => {
-		//TODO: Check if address is valid
 		const newContract = new Contract(address, Wager.abi, library.getSigner())
-		setContract(newContract)
+		
+			newContract.Done() //A: Check if it's a valid contract
+				.then(x => setContract(newContract)) //A: If it is, continue
+				.catch(err => console.log('inputContract error', address, err)) //TODO: Tell the user it's invalid
 	}
 
 	const boardInitial = [] 
@@ -282,6 +304,8 @@ function Bettor({ account, library }) {
 		}
 	}
 
+	window.web3u = Web3U
+
 	return (
 		<div>
 			<h1>Bettor</h1>
@@ -289,13 +313,13 @@ function Bettor({ account, library }) {
 				<div>
 					<ContractInfo account={account} contract={contract} />
 					<Board board={board} onClickSquare={onClickSquare}/>
-					<br/><button onClick={submitBoard}>Submit</button>
+					<br/><Button primary onClick={submitBoard} content='Submit' />
 				</div>
 			) : (
 				<div>
 					Input contract address:
-					<br/><input type="text" value={address} onChange={inputAddress} />
-					<br/><button onClick={inputContract}>Send</button>
+					<br/><Input placeholder='0x...' value={address} onChange={inputAddress} />
+					<br/><Button primary onClick={inputContract} content='Send' />
 				</div>
 			)}
 		</div>
@@ -345,20 +369,20 @@ function Creator({ account, library }) { //U: UI to setup bets
 					<div>
 						<ContractInfo account={account} contract={contract} />
 						<div>
-							<button onClick={onClickStartGames}>Start Games</button>
-							<br/><button onClick={onClickInputResults}>Input Results</button>
+							<Button onClick={onClickStartGames} content='Start Games' />
+							<br/><Button onClick={onClickInputResults} content='Input Results' />
 						</div>
 					</div>
 				) :	(
 				<div>
 					<div>
 						Input contract address:
-						<br/><input type="text" value={address} onChange={inputAddress} />
-						<br/><button onClick={inputContract}>Send</button>
+						<br/><Input value={address} onChange={inputAddress} />
+						<br/><Button primary onClick={inputContract} content='Send' />
 					</div>
 					<div>
 						Create new contract
-						<br/><button onClick={onClickCreate}>Create</button>
+						<br/><Button primary onClick={onClickCreate} content='Create' />
 					</div>
 				</div>
 			)}
@@ -396,7 +420,7 @@ function MiddlePerson() { //U: Needed for activate to work
 				<div>
 					<div>Account: {account}</div>
 					<div>
-						<button onClick={changeMode}>Change Role</button>
+						<Button onClick={changeMode} content='Change Role' />
 					</div>
 				</div>
 			</div>
@@ -405,7 +429,7 @@ function MiddlePerson() { //U: Needed for activate to work
 		return (
 			<div>
 				<h1>Wallet activation required</h1>
-				<button onClick={onClickActivate}>Activate</button>
+				<Button primary onClick={onClickActivate} content='Activate' />
 			</div>
 		)
 	}
@@ -419,8 +443,10 @@ export default function App() {
 	}
 
   return (
-		<Web3ReactProvider getLibrary={getLibrary}>
-			<MiddlePerson />
-		</Web3ReactProvider>
+		<div style={{textAlign: 'center'}}>
+			<Web3ReactProvider getLibrary={getLibrary}>
+				<MiddlePerson />
+			</Web3ReactProvider>
+		</div>
   )
 }

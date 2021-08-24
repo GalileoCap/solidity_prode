@@ -33,6 +33,7 @@
     "react-helmet-async": "^1.0.8",
     "react-lorem-ipsum": "^1.4.9",
     "react-markdown": "^6.0.2",
+    "react-native": "^0.65.1",
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.2.0",
     "react-semantic-ui": "^0.2.0",
