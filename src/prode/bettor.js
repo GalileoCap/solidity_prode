@@ -7,41 +7,63 @@ import { useForceUpdate } from './utils.js'
 
 function validBets(bets) { //U: Checks if the bettor picked a team on every game
 	let res = true
-	for (const bet of bets) { res &= bet != -1 }
+	for (const bet of bets) { res &= 0 <= bet && bet <= 2 }
 	return res
 }
 
 /* S: UI *************************************************************/
 
 function Side({ game, team, side, chosenSide, onChooseTeam }) {
-	const color = side == chosenSide ? 'green' : 'red' //A: Green -> winner, Red -> loser
+	let hasChosen = chosenSide != -1
+	let isChosen = side == chosenSide
 
-	if (chosenSide != -1) { //A: If they've already chosen a team show the correct color
+	let text
+	let color
+	let showColor
+	let width
+
+	if (side < 2) { //A: Either team
+		text = <div><Flag name={team.toLowerCase()} />{team}</div>
+		color = side == chosenSide ? 'green' : 'red' //A: Green -> winner, Red -> loser
+		showColor = hasChosen
+		width = 6
+	} else if (side == 2) { //A: Tie
+		text = <div>Tie</div>
+		color = 'grey'
+		showColor = chosenSide == side
+		width = 2
+	} else if (side == 3) { //A: Info //TODO: Move to a dropdown
+		text = <div>TODO: Info</div>
+		showColor = false
+		width = 2
+	}
+
+	if (showColor) { 
 		return (
-			<Grid.Column key={side} color={color} onClick={() => onChooseTeam(game, side)}>
-				<div><Flag name={team.toLowerCase()} />{team}</div>
+			<Grid.Column key={side} color={color} width={width} onClick={() => onChooseTeam(game, side)}>
+				{text}
 			</Grid.Column>
 		)
 	} else { //A: They haven't picked a team yet
 		return (
-			<Grid.Column key={side} onClick={() => onChooseTeam(game, side)}>
-				<div><Flag name={team.toLowerCase()} />{team}</div>
+			<Grid.Column key={side} width={width} onClick={() => onChooseTeam(game, side)}>
+				{text}
 			</Grid.Column>
 		)
 	}
 }
 
 function Game({ info, game, chosenSide, onChooseTeam }) {
-	//TODO: Date and other bets info
+	//TODO: Divider saying vs between sides
 	return (
 		<div>
 			<Segment>
-				<Grid columns={2} relaxed='very'>
+				<Grid columns='equal'>
 					<Side game={game} team={info.local} side={0} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
 					<Side game={game} team={info.away} side={1} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
+					<Side game={game} team={"tie"} side={2} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
+					<Side game={game} team={"info"} side={3} chosenSide={chosenSide} onChooseTeam={() => {}} />
 				</Grid>
-
-				<Divider vertical>vs.</Divider>
 			</Segment>
 		</div>
 	)
