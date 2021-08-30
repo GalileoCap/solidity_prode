@@ -55,6 +55,7 @@ function Side({ game, team, side, chosenSide, onChooseTeam }) {
 
 function Game({ info, game, chosenSide, onChooseTeam }) {
 	//TODO: Divider saying vs between sides
+	//TODO: Show results for finished games
 	return (
 		<div>
 			<Segment>
@@ -76,7 +77,9 @@ function BetsList({ bets, games }) {
 				{games.map((game, i) => (
 					<List.Item key={i}>
 						<List.Header>{game.local} vs. {game.away}</List.Header>
-						<List.Description>{bets[i] == 0 ? game.local : game.away}</List.Description>
+						<List.Description>
+							{bets[i] == 0 ? game.local : (bets[i] == 1 ? game.away : 'Tie')}
+						</List.Description>
 					</List.Item>
 				))}
 			</List>
