@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { Button, Header, Segment, Divider, Grid } from 'semantic-ui-react'
+import { List, Container, Button, Header, Segment, Divider, Grid, Flag, Confirm } from 'semantic-ui-react'
 
 import { useForceUpdate } from './utils.js'
+
+/* S: API ************************************************************/
+
+function validBets(bets) { //U: Checks if the bettor picked a team on every game
+	let res = true
+	for (const bet of bets) { res &= bet != -1 }
+	return res
+}
 
 /* S: UI *************************************************************/
 
@@ -11,13 +19,13 @@ function Side({ game, team, side, chosenSide, onChooseTeam }) {
 	if (chosenSide != -1) { //A: If they've already chosen a team show the correct color
 		return (
 			<Grid.Column key={side} color={color} onClick={() => onChooseTeam(game, side)}>
-				<div>{team}</div>
+				<div><Flag name={team.toLowerCase()} />{team}</div>
 			</Grid.Column>
 		)
 	} else { //A: They haven't picked a team yet
 		return (
 			<Grid.Column key={side} onClick={() => onChooseTeam(game, side)}>
-				<div>{team}</div>
+				<div><Flag name={team.toLowerCase()} />{team}</div>
 			</Grid.Column>
 		)
 	}
@@ -39,6 +47,21 @@ function Game({ info, game, chosenSide, onChooseTeam }) {
 	)
 }
 
+function BetsList({ bets, games }) {
+	return (
+		<div className="content">
+			<List>
+				{games.map((game, i) => (
+					<List.Item key={i}>
+						<List.Header>{game.local} vs. {game.away}</List.Header>
+						<List.Description>{bets[i] == 0 ? game.local : game.away}</List.Description>
+					</List.Item>
+				))}
+			</List>
+		</div>
+	)
+}
+
 export default function Bettor({ games, submitBets }) {
 	const [ bets, setBets ] = useState(Array(games.length).fill(-1))
 	const forceUpdate = useForceUpdate() 
@@ -51,16 +74,22 @@ export default function Bettor({ games, submitBets }) {
 		forceUpdate()
 	}
 
+	const [ popup, setPopup ] = useState(false)
+
 	const onClickSubmit = () => {
 		console.log('onSubmitBets bets', bets)
 		if (validBets(bets)) {
 			console.log('onSubmitBets valid bets')
-			//TODO: Ask if sure
-			submitBets()
+			setPopup(true)
 		} else {
 			console.log('onSubmitBets invalid bets')
 			//TODO: Tell the bettor
 		}
+	}
+
+	const onClickCancel = () => {
+		console.log('onClickCancel')
+		setPopup(false)
 	}
 
 	return (
@@ -68,13 +97,17 @@ export default function Bettor({ games, submitBets }) {
 			<div>
 				<Header as='h1'>Pick your winners</Header>
 			</div>
-			<div>
+			<Container>
 				{games.map((game, i) => (
 					<Game key={i} info={game} game={i} chosenSide={bets[i]} onChooseTeam={onChooseTeam}/>
 				))}
-			</div>
+			</Container>
 			<div>
 				<Button primary onClick={onClickSubmit} content='Submit' />
+				<Confirm open={popup} onConfirm={submitBets} onCancel={onClickCancel}
+					header="Are you sure?"
+					content={<BetsList bets={bets} games={games} />}
+				/>	
 			</div>
 		</div>
 	)
