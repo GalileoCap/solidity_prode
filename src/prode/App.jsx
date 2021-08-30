@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Button } from 'semantic-ui-react'
+import { Button }  from 'semantic-ui-react'
 
 import Bettor from './bettor.js'
-import Creator from './creator.js'
 
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
@@ -14,37 +13,21 @@ import { injectedConnector } from './web3.js'
 
 function MiddlePerson() { //U: Needed for activate to work
   const { chainId, account, activate, active, library } = useWeb3React()
-	const [mode, setMode] = useState('bettor')
 
   const onClickActivate = () => {
     activate(injectedConnector)
 	}
 
-	const changeMode = () => {
-		setMode(mode == 'creator' ? 'bettor' : 'creator')
+	const games = [ //U: List of games with their info //TODO: Get it from the contract
+		{local: 'Boca', away: 'River', date: new Date(2021, 8, 30)},
+		{local: 'San Lorenzo', away: 'Ferro', date: new Date(2021, 8, 31)},
+	]	
+	const submitBets = (bets) => {
+		//TODO: Sign contract and change screen
 	}
 
 	if (active) { //A: Let them bet
-		return (
-			<div>
-				{mode == 'creator' ? (
-					<div>
-						<Creator account={account} library={library} />
-					</div>
-				) : (
-					<div>
-						<Bettor account={account} library={library} />
-					</div>
-				)}
-				<br />
-				<div>
-					<div>Account: {account}</div>
-					<div>
-						<Button onClick={changeMode} content='Change Role' />
-					</div>
-				</div>
-			</div>
-		)
+		return <Bettor games={games} submitBets={submitBets}/>
 	} else { //A: Ask them to log in
 		return (
 			<div>

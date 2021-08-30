@@ -1,71 +1,81 @@
 import React, { useState, useEffect } from 'react'
-import { Button, Input } from 'semantic-ui-react'
+import { Button, Header, Segment, Divider, Grid } from 'semantic-ui-react'
 
-import { Contract, ContractFactory } from "@ethersproject/contracts"
-import Web3U from 'web3-utils'
+import { useForceUpdate } from './utils.js'
 
-import ContractInfo from './contract_info.js'
-import Board, { UpdateBoard, CheckBoard, SubmitBoard } from './board.js'
+/* S: UI *************************************************************/
 
-import Wager from '../contracts/Wager.json'
+function Side({ game, team, side, chosenSide, onChooseTeam }) {
+	const color = side == chosenSide ? 'green' : 'red' //A: Green -> winner, Red -> loser
 
-export default function Bettor({ account, library }) {
-	const [contract, setContract] = useState(undefined)
-	const [address, setAddress] = useState('') 
+	if (chosenSide != -1) { //A: If they've already chosen a team show the correct color
+		return (
+			<Grid.Column key={side} color={color} onClick={() => onChooseTeam(game, side)}>
+				<div>{team}</div>
+			</Grid.Column>
+		)
+	} else { //A: They haven't picked a team yet
+		return (
+			<Grid.Column key={side} onClick={() => onChooseTeam(game, side)}>
+				<div>{team}</div>
+			</Grid.Column>
+		)
+	}
+}
 
-	const inputAddress = (e) => {
-		setAddress(e.target.value)
+function Game({ info, game, chosenSide, onChooseTeam }) {
+	//TODO: Date and other bets info
+	return (
+		<div>
+			<Segment>
+				<Grid columns={2} relaxed='very'>
+					<Side game={game} team={info.local} side={0} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
+					<Side game={game} team={info.away} side={1} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
+				</Grid>
+
+				<Divider vertical>vs.</Divider>
+			</Segment>
+		</div>
+	)
+}
+
+export default function Bettor({ games, submitBets }) {
+	const [ bets, setBets ] = useState(Array(games.length).fill(-1))
+	const forceUpdate = useForceUpdate() 
+	
+	const onChooseTeam = (game, side) => {
+		console.log('Chose game side bets', game, side, bets)
+		const newBets = bets
+		newBets[game] = side
+		setBets(newBets)
+		forceUpdate()
 	}
 
-	const inputContract = () => {
-		const newContract = new Contract(address, Wager.abi, library.getSigner())
-		
-			newContract.Done() //A: Check if it's a valid contract
-				.then(x => setContract(newContract)) //A: If it is, continue
-				.catch(err => console.log('inputContract error', address, err)) //TODO: Tell the user it's invalid
-	}
-
-	const boardInitial = [] 
-	for (let row = 0; row < 13; row++) {
-		boardInitial.push(['_', '_', '_', '_'])
-	}
-	const [board, setBoard] = useState(boardInitial)
-
-	const onClickSquare = (row, col) => {
-		console.log('onClickSquare', row, col, board[row][col])
-		setBoard(UpdateBoard(board, row, col))
-	}
-
-	const submitBoard = () => {
-		console.log('submitBoard', board)
-
-		if (CheckBoard(board)) {
-			console.log('submitBoard submitting')
-			SubmitBoard(board, contract);
+	const onClickSubmit = () => {
+		console.log('onSubmitBets bets', bets)
+		if (validBets(bets)) {
+			console.log('onSubmitBets valid bets')
+			//TODO: Ask if sure
+			submitBets()
 		} else {
-			console.log('submitBoard invalid')
-			//TODO: Paint red the missing games/extra doubles
+			console.log('onSubmitBets invalid bets')
+			//TODO: Tell the bettor
 		}
 	}
 
 	return (
 		<div>
-			<h1>Bettor</h1>
-			{contract ? (
-				<div>
-					<ContractInfo account={account} contract={contract} />
-					<Board board={board} onClickSquare={onClickSquare}/>
-					<br/><Button primary onClick={submitBoard} content='Submit' />
-				</div>
-			) : (
-				<div>
-					Input contract address:
-					<br/><Input placeholder='0x...' value={address} onChange={inputAddress} />
-					<br/><Button primary onClick={inputContract} content='Send' />
-				</div>
-			)}
+			<div>
+				<Header as='h1'>Pick your winners</Header>
+			</div>
+			<div>
+				{games.map((game, i) => (
+					<Game key={i} info={game} game={i} chosenSide={bets[i]} onChooseTeam={onChooseTeam}/>
+				))}
+			</div>
+			<div>
+				<Button primary onClick={onClickSubmit} content='Submit' />
+			</div>
 		</div>
 	)
 }
-
-export {Bettor}
