@@ -19,8 +19,9 @@ function MiddlePerson() { //U: Needed for activate to work
 	}
 
 	const games = [ //U: List of games with their info //TODO: Get it from the contract
-		{local: 'Boca', away: 'River', date: new Date(2021, 8, 30)},
-		{local: 'San Lorenzo', away: 'Ferro', date: new Date(2021, 8, 31)},
+		{local: 'Kazakhstan', away: 'Ukraine', date: new Date(2021, 9, 1, 11)},
+		{local: 'Malta', away: 'Cyprus', date: new Date(2021, 9, 1, 15, 45)},
+		{local: 'Faroe Islands', away: 'Israel', date: new Date(2021, 9, 1, 15, 45)},
 	]	
 	const submitBets = (bets) => {
 		//TODO: Sign contract and change screen
