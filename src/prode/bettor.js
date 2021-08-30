@@ -33,7 +33,7 @@ function Side({ game, team, side, chosenSide, onChooseTeam }) {
 		showColor = chosenSide == side
 		width = 2
 	} else if (side == 3) { //A: Info //TODO: Move to a dropdown
-		text = <div>TODO: Info</div>
+		text = <div>Show Info</div>
 		showColor = false
 		width = 2
 	}
@@ -56,17 +56,28 @@ function Side({ game, team, side, chosenSide, onChooseTeam }) {
 function Game({ info, game, chosenSide, onChooseTeam }) {
 	//TODO: Divider saying vs between sides
 	//TODO: Show results for finished games
+	const [ showInfo, setShowInfo ] = useState(false)
+
+	const shideInfo = () => { setShowInfo(!showInfo) }
+
 	return (
-		<div>
-			<Segment>
-				<Grid columns='equal'>
-					<Side game={game} team={info.local} side={0} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
-					<Side game={game} team={info.away} side={1} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
-					<Side game={game} team={"tie"} side={2} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
-					<Side game={game} team={"info"} side={3} chosenSide={chosenSide} onChooseTeam={() => {}} />
-				</Grid>
-			</Segment>
-		</div>
+		<Segment>
+			<Grid columns='equal' divided>
+				<Grid.Row>
+				<Side game={game} team={info.local} side={0} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
+				<Side game={game} team={info.away} side={1} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
+				<Side game={game} team={"tie"} side={2} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
+				<Side game={game} team={"info"} side={3} chosenSide={chosenSide} onChooseTeam={shideInfo} />
+				</Grid.Row>
+				{showInfo ?
+					<Grid.Row>
+						<Grid.Column>
+							TODO: Info
+						</Grid.Column> 
+					</Grid.Row>
+				: ''}
+			</Grid>
+		</Segment>
 	)
 }
 
