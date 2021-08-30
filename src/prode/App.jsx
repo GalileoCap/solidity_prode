@@ -7,7 +7,7 @@ import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
 
-import { injectedConnector } from './web3.js'
+import { submitBets, injectedConnector } from './web3.js'
 
 /* S: UI Manager ********************************************/
 
@@ -23,12 +23,9 @@ function MiddlePerson() { //U: Needed for activate to work
 		{local: 'Malta', away: 'Cyprus', date: new Date(2021, 9, 1, 15, 45)},
 		{local: 'Faroe Islands', away: 'Israel', date: new Date(2021, 9, 1, 15, 45)},
 	]	
-	const submitBets = (bets) => {
-		//TODO: Sign contract and change screen
-	}
 
 	if (active) { //A: Let them bet
-		return <Bettor games={games} submitBets={submitBets}/>
+		return <Bettor games={games} submitBets={submitBets} library={library}/>
 	} else { //A: Ask them to log in
 		return (
 			<div>

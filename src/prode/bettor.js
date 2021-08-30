@@ -98,7 +98,7 @@ function BetsList({ bets, games }) {
 	)
 }
 
-export default function Bettor({ games, submitBets }) {
+export default function Bettor({ games, submitBets, library }) {
 	const [ bets, setBets ] = useState(Array(games.length).fill(-1))
 	const forceUpdate = useForceUpdate() 
 	
@@ -140,7 +140,7 @@ export default function Bettor({ games, submitBets }) {
 			</Container>
 			<div>
 				<Button primary onClick={onClickSubmit} content='Submit' />
-				<Confirm open={popup} onConfirm={submitBets} onCancel={onClickCancel}
+				<Confirm open={popup} onConfirm={() => submitBets(bets, library)} onCancel={onClickCancel}
 					header="Are you sure?"
 					content={<BetsList bets={bets} games={games} />}
 				/>	
