@@ -8,6 +8,7 @@ import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
 
 import { submitBets, injectedConnector } from './web3.js'
+import { games } from './data.json'
 
 /* S: UI Manager ********************************************/
 
@@ -17,22 +18,6 @@ function MiddlePerson() { //U: Needed for activate to work
   const onClickActivate = () => {
     activate(injectedConnector)
 	}
-
-	const games = [ //U: List of games with their info //TODO: Get it from the contract
-		{local: 'Kazakhstan', away: 'Ukraine', date: new Date(2021, 9, 1, 11)},
-		{local: 'Malta', away: 'Cyprus', date: new Date(2021, 9, 1, 15, 45)},
-		{local: 'Faroe Islands', away: 'Israel', date: new Date(2021, 9, 1, 15, 45)},
-		{local: 'Moldova', away: 'Austria', date: new Date(2021, 9, 1, 15, 45)},
-		{local: 'Luxembourg', away: 'Azerbaijan', date: new Date(2021, 9, 1, 15, 45)},
-		{local: 'Latvia', away: 'Gibraltar', date: new Date(2021, 9, 1, 15, 45)},
-		{local: 'Norway', away: 'Netherlands', date: new Date(2021, 9, 1, 15, 45)},
-		{local: 'Slovenia', away: 'Slovakia', date: new Date(2021, 9, 1, 15, 45)},
-		{local: 'Denmark', away: 'Scotland', date: new Date(2021, 9, 1, 15, 45)},
-		{local: 'Turkey', away: 'Montenegro', date: new Date(2021, 9, 1, 15, 45)},
-		{local: 'Russia', away: 'Croatia', date: new Date(2021, 9, 1, 15, 45)},
-		{local: 'Portugal', away: 'Republic of Ireland', date: new Date(2021, 9, 1, 15, 45)},
-		{local: 'Qatar', away: 'Serbia', date: new Date(2021, 9, 1, 15, 45)},
-	]	
 
 	if (active) { //A: Let them bet
 		return <Bettor games={games} submitBets={submitBets} library={library}/>
