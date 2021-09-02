@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { List, Container, Button, Header, Segment, Flag, Confirm } from 'semantic-ui-react'
 
-import { useForceUpdate } from './utils.js'
+import { useForceUpdate, conseguirVarios } from './utils.js'
 import { claimPrize, getBettor, getStarted, getDone } from './web3.js'
 
 import { games } from './data.json'
@@ -164,19 +164,27 @@ function Manage({ bettor, started, done, library, forceUpdate }) {
 }
 
 export default function Bettor({ submitBets, library }) {
-	const [bettor, setBettor] = useState(undefined)
-	const [started, setStarted] = useState(false)
-	const [done, setDone] = useState(false)
+	const [data, setData] = useState({bettor: undefined, started: false, done:false})
 
-	getBettor(library).then(setBettor)
-	getStarted(library).then(setStarted)
-	getDone(library).then(setDone)
+	const updateData = async () => {
+		const comoConseguir = {
+			bettor: async () => ( await getBettor(library) ),
+			started: async () => ( await getStarted(library) ),
+			done: async () => ( await getDone(library) )
+		}
 
-	if (bettor == undefined) {
+		const newData = await conseguirVarios(comoConseguir, 'bettor updateData')
+		setData(newData)
+		console.log('bettor updateData done', newData)
+	}
+
+	useEffect(() => { updateData() }, [submitBets, library])
+
+	if (data.bettor == undefined) {
 		return <Container />
-	} else if (!bettor.voted && !started && !done) {
+	} else if (!data.bettor.voted && !data.started && !data.done) {
 		return <Betting submitBets={submitBets} library={library} />
 	} else {
-		return <Manage bettor={bettor} library={library} />
+		return <Manage bettor={data.bettor} library={library} />
 	}
 }
