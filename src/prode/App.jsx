@@ -9,7 +9,6 @@ import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
 
 import { submitBets, injectedConnector } from './web3.js'
-import { games } from './data.json'
 
 /* S: UI Manager ********************************************/
 
@@ -25,7 +24,7 @@ function MiddlePerson() { //U: Needed for activate to work
 			<TopMenu />
 			<Container text style={{ marginTop: '4em' }}>
 				{active ? 
-					<Bettor games={games} submitBets={submitBets} library={library}/>
+					<Bettor submitBets={submitBets} library={library}/>
 				: (
 					<div>
 						<h1>Wallet activation required</h1>

@@ -25,3 +25,25 @@ export function submitBets(bets, library) {
 		.then(x => console.log('submitBets DONE'))
 		.catch(err => console.error('submitBets', address, err))
 }
+
+export function claimPrize(library) {
+	const contract = new Contract(address, Wager.abi, library.getSigner())
+	contract.claimPrize()
+		.then(x => console.log('claimPrize DONE'))
+		.catch(err => console.error('claimPrize', address, err))
+}
+
+export function getBettor(library) {
+	const contract = new Contract(address, Wager.abi, library.getSigner())
+	return contract.getBettor()
+}
+
+export function getStarted(library) {
+	const contract = new Contract(address, Wager.abi, library.getSigner())
+	return contract.Started()
+}
+
+export function getDone(library) {
+	const contract = new Contract(address, Wager.abi, library.getSigner())
+	return contract.Done()
+}

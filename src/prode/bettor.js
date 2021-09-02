@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { List, Container, Button, Header, Segment, Divider, Grid, Flag, Confirm } from 'semantic-ui-react'
 
 import { useForceUpdate } from './utils.js'
+import { claimPrize, getBettor, getStarted, getDone } from './web3.js'
+
+import { games } from './data.json'
 
 /* S: API ************************************************************/
 
@@ -11,7 +14,7 @@ function validBets(bets) { //U: Checks if the bettor picked a team on every game
 	return res
 }
 
-/* S: UI *************************************************************/
+/* S: Betting UI *****************************************************/
 
 function Side({ game, team, side, chosenSide, onChooseTeam }) {
 	let hasChosen = chosenSide != -1
@@ -81,7 +84,7 @@ function Game({ info, game, chosenSide, onChooseTeam }) {
 	)
 }
 
-function BetsList({ bets, games }) {
+function BetsList({ bets }) {
 	return (
 		<div className="content">
 			<List>
@@ -98,7 +101,7 @@ function BetsList({ bets, games }) {
 	)
 }
 
-export default function Bettor({ games, submitBets, library }) {
+function Betting({ submitBets, library }) {
 	const [ bets, setBets ] = useState(Array(games.length).fill(-1))
 	const forceUpdate = useForceUpdate() 
 	
@@ -129,22 +132,62 @@ export default function Bettor({ games, submitBets, library }) {
 	}
 
 	return (
-		<div>
-			<div>
-				<Header as='h1'>Pick your winners</Header>
-			</div>
+		<Container>
+			<Header as='h1'>Pick your winners</Header>
 			<Container>
 				{games.map((game, i) => (
 					<Game key={i} info={game} game={i} chosenSide={bets[i]} onChooseTeam={onChooseTeam}/>
 				))}
 			</Container>
-			<div>
-				<Button primary onClick={onClickSubmit} content='Submit' />
-				<Confirm open={popup} onConfirm={() => submitBets(bets, library)} onCancel={onClickCancel}
-					header="Are you sure?"
-					content={<BetsList bets={bets} games={games} />}
-				/>	
-			</div>
-		</div>
+			<Button primary onClick={onClickSubmit} content='Submit' style={{ marginTop: '1.5em' }}/>
+			<Confirm open={popup} onConfirm={() => submitBets(bets, library)} onCancel={onClickCancel}
+				header="Are you sure?"
+				content={<BetsList bets={bets} />}
+			/>	
+		</Container>
 	)
+}
+
+/* S: Managing UI ****************************************************/
+
+function Manage({ bettor, started, done, library, forceUpdate }) {
+	const claimButton = () => {
+		const text = 'Claim Prize'	
+
+		if (!done || bettor.extracted) {
+			return <Button secondary disabled content={text} />
+		} else {
+			return <Button primary onClick={() => claimPrize(library)}content={text} />
+		}
+	}
+
+	//TODO: Per-game info
+
+	return (
+		<Container>
+			<Container>
+				<Header as='h1'>Info</Header>
+				{claimButton()}
+			</Container>
+		</Container>
+	)
+	//TODO: <Button secondary content='Update' style={{ marginTop: '1em' }}/>
+}
+
+export default function Bettor({ submitBets, library }) {
+	const [bettor, setBettor] = useState(undefined)
+	const [started, setStarted] = useState(false)
+	const [done, setDone] = useState(false)
+
+	getBettor(library).then(setBettor)
+	getStarted(library).then(setStarted)
+	getDone(library).then(setDone)
+
+	if (bettor == undefined) {
+		return <Container />
+	} else if (!bettor.voted && !started && !done) {
+		return <Betting submitBets={submitBets} library={library} />
+	} else {
+		return <Manage bettor={bettor} library={library} />
+	}
 }
