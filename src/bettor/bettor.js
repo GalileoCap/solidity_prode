@@ -4,7 +4,7 @@ import { Container }  from 'semantic-ui-react'
 import { useWeb3React } from '@web3-react/core'
 
 import { conseguirVarios } from '../utils/utils.js'
-import { getBettor, getStarted, getDone } from '../utils/web3.js'
+import { getFromContract } from '../utils/web3.js'
 
 import Betting from './betting.js'
 import Managing from './managing.js'
@@ -16,9 +16,9 @@ export default function Bettor() {
 
 	const updateData = async () => {
 		const comoConseguir = {
-			bettor: async () => ( await getBettor(library) ),
-			started: async () => ( await getStarted(library) ),
-			done: async () => ( await getDone(library) )
+			bettor: async () => ( await getFromContract(['bettor'], library) ),
+			started: async () => ( await getFromContract(['started'], library) ),
+			done: async () => ( await getFromContract(['done'], library) )
 		}
 
 		const newData = await conseguirVarios(comoConseguir, 'bettor updateData')

@@ -19,31 +19,30 @@ export const injectedConnector = new InjectedConnector({
   ],
 })
 
+function getContract(library) {
+	return new Contract(address, Wager.abi, library.getSigner())
+}
+
 export function submitBets(bets, library) {
-	const contract = new Contract(address, Wager.abi, library.getSigner())
+	const contract = getContract(library)
 	contract.placeBet(bets, { value: Web3U.toWei('1.0', 'ether') })
 		.then(x => console.log('submitBets DONE'))
 		.catch(err => console.error('submitBets', address, err))
 }
 
 export function claimPrize(library) {
-	const contract = new Contract(address, Wager.abi, library.getSigner())
+	const contract = getContract(library)
 	contract.claimPrize()
 		.then(x => console.log('claimPrize DONE'))
 		.catch(err => console.error('claimPrize', address, err))
 }
 
-export function getBettor(library) {
-	const contract = new Contract(address, Wager.abi, library.getSigner())
-	return contract.getBettor()
-}
+export function getFromContract(args, library) {
+	const contract = getContract(library)
 
-export function getStarted(library) {
-	const contract = new Contract(address, Wager.abi, library.getSigner())
-	return contract.Started()
-}
-
-export function getDone(library) {
-	const contract = new Contract(address, Wager.abi, library.getSigner())
-	return contract.Done()
+	if (args[0] == 'bettor') { return contract.getBettor() }
+	else if (args[0] == 'started') { return contract.Started() }
+	else if (args[0] == 'done') { return contract.Done() }
+	else if (args[0] == 'game') { return contract.Games(args[1]) }
+	else { console.error('getFromContract invalid arguments', args) }
 }
