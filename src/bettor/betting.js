@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { List, Container, Button, Header, Segment, Flag, Confirm } from 'semantic-ui-react'
 
+import { useWeb3React } from '@web3-react/core'
+
 import { useForceUpdate } from '../utils/utils.js'
-import { claimPrize } from '../utils/web3.js'
+import { submitBets } from '../utils/web3.js'
 
 import { games } from '../data.json'
 
@@ -90,7 +92,9 @@ function BetsList({ bets }) {
 	)
 }
 
-export default function Betting({ submitBets, library }) {
+export default function Betting() {
+	const { chainId, account, activate, active, library } = useWeb3React()
+
 	const [ bets, setBets ] = useState(Array(games.length).fill(-1))
 	const forceUpdate = useForceUpdate() 
 	

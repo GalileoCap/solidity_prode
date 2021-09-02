@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Button, Header } from 'semantic-ui-react'
 
+import { useWeb3React } from '@web3-react/core'
+
 import { claimPrize } from '../utils/web3.js'
 
 /* S: Managing UI ****************************************************/
 
-export default function Manage({ bettor, started, done, library, forceUpdate }) {
+export default function Manage({ bettor, started, done, forceUpdate }) {
+	const { chainId, account, activate, active, library } = useWeb3React()
+
 	const claimButton = () => {
-		const text = 'Claim Prize'	
+		const text = 'Claim Prize'
 
 		if (!done || bettor.extracted) {
 			return <Button secondary disabled content={text} />

@@ -14,7 +14,7 @@ import { submitBets, injectedConnector } from './utils/web3.js'
 /* S: UI Manager ********************************************/
 
 function MiddlePerson() { //U: Needed for activate to work
-  const { chainId, account, activate, active, library } = useWeb3React()
+	const { chainId, account, activate, active, library } = useWeb3React()
 
   const onClickActivate = () => {
     activate(injectedConnector)
@@ -25,7 +25,7 @@ function MiddlePerson() { //U: Needed for activate to work
 			<TopMenu />
 			<Container text style={{ marginTop: '4em' }}>
 				{active ? 
-					<Bettor submitBets={submitBets} library={library}/>
+					<Bettor submitBets={submitBets} />
 				: (
 					<div>
 						<h1>Wallet activation required</h1>

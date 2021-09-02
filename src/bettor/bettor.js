@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { Container }  from 'semantic-ui-react'
 
+import { useWeb3React } from '@web3-react/core'
+
 import { conseguirVarios } from '../utils/utils.js'
 import { getBettor, getStarted, getDone } from '../utils/web3.js'
 
 import Betting from './betting.js'
 import Managing from './managing.js'
 
-export default function Bettor({ submitBets, library }) {
+export default function Bettor() {
+	const { chainId, account, activate, active, library } = useWeb3React()
+
 	const [data, setData] = useState({bettor: undefined, started: false, done:false})
 
 	const updateData = async () => {
@@ -22,13 +26,13 @@ export default function Bettor({ submitBets, library }) {
 		console.log('bettor updateData done', newData)
 	}
 
-	useEffect(() => { updateData() }, [submitBets, library])
+	useEffect(() => { updateData() }, [account])
 
 	if (data.bettor == undefined) {
 		return <Container />
 	} else if (!data.bettor.voted && !data.started && !data.done) {
-		return <Betting submitBets={submitBets} library={library} />
+		return <Betting />
 	} else {
-		return <Managing bettor={data.bettor} library={library} />
+		return <Managing bettor={data.bettor} />
 	}
 }
