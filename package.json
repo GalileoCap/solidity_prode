@@ -1,7 +1,7 @@
 {
-  "name": "PodemosAprenderReact",
-  "version": "0.0.1",
-  "description": "Una UI para PodemosAprender con React y MaterialUI",
+  "name": "GaliProde",
+  "version": "1.0.0",
+  "description": "",
   "scripts": {
     "start": "vite --host 0.0.0.0",
     "build": "vite build",
