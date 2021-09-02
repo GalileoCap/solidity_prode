@@ -18,20 +18,20 @@ function validBets(bets) { //U: Checks if the bettor picked a team on every game
 
 /* S: Betting UI *****************************************************/
 
-function Game({ info, game, chosenSide, onChooseTeam }) {
+function Game({ game, y, chosenSide, onChooseTeam }) {
 	const [ showInfo, setShowInfo ] = useState(false)
 
 	const shideInfo = () => { setShowInfo(!showInfo) }
 
 	const buttonSideComponent = (side) => {
-		const team = side == 0 ? info.local : info.away
+		const team = side == 0 ? game.local : game.away
 		const text = <div><Flag name={team.toLowerCase()} />{team}</div>
 		const color = side == chosenSide ? 'green' : 'red'
 
 		if (chosenSide != -1) {
-			return <Button color={color} onClick={() => onChooseTeam(game, side)} content={text} />
+			return <Button color={color} onClick={() => onChooseTeam(y, side)} content={text} />
 		} else {
-			return <Button onClick={() => onChooseTeam(game, side)} content={text} />
+			return <Button onClick={() => onChooseTeam(y, side)} content={text} />
 		}
 	}
 
@@ -39,9 +39,21 @@ function Game({ info, game, chosenSide, onChooseTeam }) {
 		const text = 'Tie'
 
 		if (chosenSide == 2) {
-			return <Button color="grey" onClick={() => onChooseTeam(game, 2)} content={text} />
+			return <Button color="grey" onClick={() => onChooseTeam(y, 2)} content={text} />
 		} else {
-			return <Button onClick={() => onChooseTeam(game, 2)} content={text} />
+			return <Button onClick={() => onChooseTeam(y, 2)} content={text} />
+		}
+	}
+
+	const infoComponent = () => {
+		if (showInfo) {
+			const date = game.info.date //TODO: Timezones 
+
+			return (
+				<List.Item>
+					Date: {date}
+				</List.Item>
+			)
 		}
 	}
 
@@ -65,11 +77,7 @@ function Game({ info, game, chosenSide, onChooseTeam }) {
 						</List.Item>
 					</List>
 				</List.Item>
-				{showInfo ?
-					<List.Item>
-						TODO: Info
-					</List.Item>
-				: ''}
+				{infoComponent()}
 			</List>
 		</Segment>
 	)
@@ -79,11 +87,11 @@ function BetsList({ bets }) {
 	return (
 		<div className="content">
 			<List>
-				{games.map((game, i) => (
-					<List.Item key={i}>
+				{games.map((game, y) => (
+					<List.Item key={y}>
 						<List.Header>{game.local} vs. {game.away}</List.Header>
 						<List.Description>
-							{bets[i] == 0 ? game.local : (bets[i] == 1 ? game.away : 'Tie')}
+							{bets[y] == 0 ? game.local : (bets[y] == 1 ? game.away : 'Tie')}
 						</List.Description>
 					</List.Item>
 				))}
@@ -128,8 +136,8 @@ export default function Betting() {
 		<Container>
 			<Header as='h1'>Pick your winners</Header>
 			<Container>
-				{games.map((game, i) => (
-					<Game key={i} info={game} game={i} chosenSide={bets[i]} onChooseTeam={onChooseTeam}/>
+				{games.map((game, y) => (
+					<Game key={y} game={game} y={y} chosenSide={bets[y]} onChooseTeam={onChooseTeam}/>
 				))}
 			</Container>
 			<Button primary onClick={onClickSubmit} content='Submit' style={{ marginTop: '1.5em' }}/>
