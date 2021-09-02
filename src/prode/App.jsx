@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Button }  from 'semantic-ui-react'
+import { Container, Button }  from 'semantic-ui-react'
 
+import { TopMenu, BottomMenu } from './menu.js'
 import Bettor from './bettor.js'
 
 import { Web3ReactProvider } from '@web3-react/core'
@@ -19,16 +20,22 @@ function MiddlePerson() { //U: Needed for activate to work
     activate(injectedConnector)
 	}
 
-	if (active) { //A: Let them bet
-		return <Bettor games={games} submitBets={submitBets} library={library}/>
-	} else { //A: Ask them to log in
-		return (
-			<div>
-				<h1>Wallet activation required</h1>
-				<Button primary onClick={onClickActivate} content='Activate' />
-			</div>
-		)
-	}
+	return (
+		<div>
+			<TopMenu />
+			<Container text style={{ marginTop: '4em' }}>
+				{active ? 
+					<Bettor games={games} submitBets={submitBets} library={library}/>
+				: (
+					<div>
+						<h1>Wallet activation required</h1>
+						<Button primary onClick={onClickActivate} content='Activate' />
+					</div>
+				)}
+			</Container>
+			<BottomMenu />
+		</div>
+	)
 }
 
 export default function App() {
