@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Button }  from 'semantic-ui-react'
 
-import { TopMenu, BottomMenu } from './menu.js'
-import Bettor from './bettor.js'
+import TopMenu from './menu/topMenu.js'
+import BottomMenu from './menu/bottomMenu.js'
+import Bettor from './bettor/bettor.js'
 
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
 
-import { submitBets, injectedConnector } from './web3.js'
+import { submitBets, injectedConnector } from './utils/web3.js'
 
 /* S: UI Manager ********************************************/
 

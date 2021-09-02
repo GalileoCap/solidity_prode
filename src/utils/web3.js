@@ -6,7 +6,7 @@ import { Contract, ContractFactory } from "@ethersproject/contracts"
 import Web3U from 'web3-utils'
 
 import Wager from '../contracts/Wager.json'
-import { address } from './data.json'
+import { address } from '../data.json'
 
 export const injectedConnector = new InjectedConnector({
   supportedChainIds: [

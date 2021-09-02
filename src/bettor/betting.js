@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { List, Container, Button, Header, Segment, Flag, Confirm } from 'semantic-ui-react'
 
-import { useForceUpdate, conseguirVarios } from './utils.js'
-import { claimPrize, getBettor, getStarted, getDone } from './web3.js'
+import { useForceUpdate } from '../utils/utils.js'
+import { claimPrize } from '../utils/web3.js'
 
-import { games } from './data.json'
+import { games } from '../data.json'
 
 /* S: API ************************************************************/
 
@@ -90,7 +90,7 @@ function BetsList({ bets }) {
 	)
 }
 
-function Betting({ submitBets, library }) {
+export default function Betting({ submitBets, library }) {
 	const [ bets, setBets ] = useState(Array(games.length).fill(-1))
 	const forceUpdate = useForceUpdate() 
 	
@@ -135,56 +135,4 @@ function Betting({ submitBets, library }) {
 			/>	
 		</Container>
 	)
-}
-
-/* S: Managing UI ****************************************************/
-
-function Manage({ bettor, started, done, library, forceUpdate }) {
-	const claimButton = () => {
-		const text = 'Claim Prize'	
-
-		if (!done || bettor.extracted) {
-			return <Button secondary disabled content={text} />
-		} else {
-			return <Button primary onClick={() => claimPrize(library)}content={text} />
-		}
-	}
-
-	//TODO: Per-game info
-
-	return (
-		<Container>
-			<Container>
-				<Header as='h1'>Info</Header>
-				{claimButton()}
-			</Container>
-		</Container>
-	)
-	//TODO: <Button secondary content='Update' style={{ marginTop: '1em' }}/>
-}
-
-export default function Bettor({ submitBets, library }) {
-	const [data, setData] = useState({bettor: undefined, started: false, done:false})
-
-	const updateData = async () => {
-		const comoConseguir = {
-			bettor: async () => ( await getBettor(library) ),
-			started: async () => ( await getStarted(library) ),
-			done: async () => ( await getDone(library) )
-		}
-
-		const newData = await conseguirVarios(comoConseguir, 'bettor updateData')
-		setData(newData)
-		console.log('bettor updateData done', newData)
-	}
-
-	useEffect(() => { updateData() }, [submitBets, library])
-
-	if (data.bettor == undefined) {
-		return <Container />
-	} else if (!data.bettor.voted && !data.started && !data.done) {
-		return <Betting submitBets={submitBets} library={library} />
-	} else {
-		return <Manage bettor={data.bettor} library={library} />
-	}
 }

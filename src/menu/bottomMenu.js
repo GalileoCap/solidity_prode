@@ -1,24 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import { Menu, Container, Divider, Dropdown, Grid, Header, Image, List, Segment } from 'semantic-ui-react'
-
-/* S: API ************************************************************/
+import React from 'react'
+import { Container, Image, List, Segment } from 'semantic-ui-react'
 
 /* S: UI *************************************************************/
 
-export function TopMenu() {
-	return (
-		<Menu fixed='top' inverted>
-			<Container>
-				<Menu.Item as='a' header>
-				GaliProde
-				</Menu.Item>
-				<Menu.Item as='a' href='/current'>Current Games</Menu.Item>
-			</Container>
-		</Menu>
-	)
-}
-
-export function BottomMenu() {
+export default function BottomMenu() {
 	//TODO: Links
 	return (
 		<Segment inverted vertical style={{ marginTop: '1em' }}>
