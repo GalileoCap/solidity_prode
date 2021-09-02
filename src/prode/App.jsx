@@ -1,58 +1,40 @@
 import React, { useState, useEffect } from 'react'
-import { Button } from 'semantic-ui-react'
+import { Container, Button }  from 'semantic-ui-react'
 
+import { TopMenu, BottomMenu } from './menu.js'
 import Bettor from './bettor.js'
-import Creator from './creator.js'
 
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
 
-import { injectedConnector } from './web3.js'
+import { submitBets, injectedConnector } from './web3.js'
 
 /* S: UI Manager ********************************************/
 
 function MiddlePerson() { //U: Needed for activate to work
   const { chainId, account, activate, active, library } = useWeb3React()
-	const [mode, setMode] = useState('bettor')
 
   const onClickActivate = () => {
     activate(injectedConnector)
 	}
 
-	const changeMode = () => {
-		setMode(mode == 'creator' ? 'bettor' : 'creator')
-	}
-
-	if (active) { //A: Let them bet
-		return (
-			<div>
-				{mode == 'creator' ? (
+	return (
+		<div>
+			<TopMenu />
+			<Container text style={{ marginTop: '4em' }}>
+				{active ? 
+					<Bettor submitBets={submitBets} library={library}/>
+				: (
 					<div>
-						<Creator account={account} library={library} />
-					</div>
-				) : (
-					<div>
-						<Bettor account={account} library={library} />
+						<h1>Wallet activation required</h1>
+						<Button primary onClick={onClickActivate} content='Activate' />
 					</div>
 				)}
-				<br />
-				<div>
-					<div>Account: {account}</div>
-					<div>
-						<Button onClick={changeMode} content='Change Role' />
-					</div>
-				</div>
-			</div>
-		)
-	} else { //A: Ask them to log in
-		return (
-			<div>
-				<h1>Wallet activation required</h1>
-				<Button primary onClick={onClickActivate} content='Activate' />
-			</div>
-		)
-	}
+			</Container>
+			<BottomMenu />
+		</div>
+	)
 }
 
 export default function App() {
