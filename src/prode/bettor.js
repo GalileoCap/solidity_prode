@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { List, Container, Button, Header, Segment, Divider, Grid, Flag, Confirm } from 'semantic-ui-react'
+import { List, Container, Button, Header, Segment, Flag, Confirm } from 'semantic-ui-react'
 
 import { useForceUpdate } from './utils.js'
 import { claimPrize, getBettor, getStarted, getDone } from './web3.js'
@@ -16,70 +16,59 @@ function validBets(bets) { //U: Checks if the bettor picked a team on every game
 
 /* S: Betting UI *****************************************************/
 
-function Side({ game, team, side, chosenSide, onChooseTeam }) {
-	let hasChosen = chosenSide != -1
-	let isChosen = side == chosenSide
-
-	let text
-	let color
-	let showColor
-	let width
-
-	if (side < 2) { //A: Either team
-		text = <div><Flag name={team.toLowerCase()} />{team}</div>
-		color = side == chosenSide ? 'green' : 'red' //A: Green -> winner, Red -> loser
-		showColor = hasChosen
-		width = 6
-	} else if (side == 2) { //A: Tie
-		text = <div>Tie</div>
-		color = 'grey'
-		showColor = chosenSide == side
-		width = 2
-	} else if (side == 3) { //A: Info //TODO: Move to a dropdown
-		text = <div>Show Info</div>
-		showColor = false
-		width = 2
-	}
-
-	if (showColor) { 
-		return (
-			<Grid.Column key={side} color={color} width={width} onClick={() => onChooseTeam(game, side)}>
-				{text}
-			</Grid.Column>
-		)
-	} else { //A: They haven't picked a team yet
-		return (
-			<Grid.Column key={side} width={width} onClick={() => onChooseTeam(game, side)}>
-				{text}
-			</Grid.Column>
-		)
-	}
-}
-
 function Game({ info, game, chosenSide, onChooseTeam }) {
-	//TODO: Divider saying vs between sides
-	//TODO: Show results for finished games
 	const [ showInfo, setShowInfo ] = useState(false)
 
 	const shideInfo = () => { setShowInfo(!showInfo) }
 
+	const buttonSideComponent = (side) => {
+		const team = side == 0 ? info.local : info.away
+		const text = <div><Flag name={team.toLowerCase()} />{team}</div>
+		const color = side == chosenSide ? 'green' : 'red'
+
+		if (chosenSide != -1) {
+			return <Button color={color} onClick={() => onChooseTeam(game, side)} content={text} />
+		} else {
+			return <Button onClick={() => onChooseTeam(game, side)} content={text} />
+		}
+	}
+
+	const buttonTieComponent = () => {
+		const text = 'Tie'
+
+		if (chosenSide == 2) {
+			return <Button color="grey" onClick={() => onChooseTeam(game, 2)} content={text} />
+		} else {
+			return <Button onClick={() => onChooseTeam(game, 2)} content={text} />
+		}
+	}
+
 	return (
 		<Segment>
-			<Grid columns='equal' divided>
-				<Grid.Row>
-				<Side game={game} team={info.local} side={0} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
-				<Side game={game} team={info.away} side={1} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
-				<Side game={game} team={"tie"} side={2} chosenSide={chosenSide} onChooseTeam={onChooseTeam} />
-				<Side game={game} team={"info"} side={3} chosenSide={chosenSide} onChooseTeam={shideInfo} />
-				</Grid.Row>
+			<List>
+				<List.Item>
+					<List horizontal>
+						<List.Item>
+							<Button.Group size="big">
+								{buttonSideComponent(0)}
+								<Button.Or text="vs." />
+								{buttonSideComponent(1)}
+							</Button.Group>
+						</List.Item>
+						<List.Item>
+							{buttonTieComponent()}
+						</List.Item>
+							<Button size="small" onClick={shideInfo} content='Show Info' />
+						<List.Item>
+						</List.Item>
+					</List>
+				</List.Item>
 				{showInfo ?
-					<Grid.Row>
-						<Grid.Column>
-							TODO: Info
-						</Grid.Column> 
-					</Grid.Row>
+					<List.Item>
+						TODO: Info
+					</List.Item>
 				: ''}
-			</Grid>
+			</List>
 		</Segment>
 	)
 }
