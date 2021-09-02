@@ -5,6 +5,8 @@ import { InjectedConnector } from '@web3-react/injected-connector'
 import { Contract, ContractFactory } from "@ethersproject/contracts"
 import Web3U from 'web3-utils'
 
+window.Web3U = Web3U
+
 import Wager from '../contracts/Wager.json'
 import { address } from '../data.json'
 
@@ -43,6 +45,6 @@ export function getFromContract(args, library) {
 	if (args[0] == 'bettor') { return contract.getBettor() }
 	else if (args[0] == 'started') { return contract.Started() }
 	else if (args[0] == 'done') { return contract.Done() }
-	else if (args[0] == 'game') { return contract.Games(args[1]) }
+	else if (args[0] == 'game') { return contract.getGame(args[1]) }
 	else { console.error('getFromContract invalid arguments', args) }
 }
