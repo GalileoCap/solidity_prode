@@ -28,9 +28,11 @@ function getContract(library, address = Address) {
 
 export function submitBets(bets, library, address = Address) {
 	const contract = getContract(library)
-	contract.placeBet(bets, { value: Web3U.toWei('1.0', 'ether') })
-		.then(x => console.log('submitBets DONE'))
-		.catch(err => console.error('submitBets', address, err))
+	getFromContract(['price'], library, address).then(price => {
+		contract.placeBet(bets, { value: price })
+			.then(x => console.log('submitBets DONE'))
+			.catch(err => console.error('submitBets', address, err))
+	})
 }
 
 export function claimPrize(library, address = Address) {
