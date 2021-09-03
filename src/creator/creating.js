@@ -25,9 +25,10 @@ export default function Creating({ setAddress }) {
 	const [popUp, setPopUp] = useState(false)
 	const onClickConfirm = async () => {
 		const contract = await createContract(price, library)
-		contract.deployTransaction.wait().then(
-			setAddress(contract.address)
-		)
+		await contract.deployTransaction.wait()
+
+		setAddress(contract.address)
+		console.log('onClickConfirm address', contract.address)
 	}
 
 	const onClickCancel = () => {

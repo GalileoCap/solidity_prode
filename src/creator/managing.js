@@ -72,6 +72,11 @@ export default function Managing({ address }) {
 
 			<List>
 				<List.Item>
+					<List.Header content='Address' />
+					{address}
+				</List.Item>
+
+				<List.Item>
 					<List.Header content='TotalPool' />
 					{Web3U.fromWei(info.totalPool._hex, 'ether')}
 				</List.Item>
