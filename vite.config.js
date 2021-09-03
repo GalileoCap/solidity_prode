@@ -5,6 +5,8 @@ import polyfillNode from 'rollup-plugin-polyfill-node'
 
 import fs from "fs";
 
+import rollupConfig from './rollup.config.js'
+
 const estamosEnGlitch= process.env.PROJECT_REMIX_CHAIN!=null //A: la encontre con set en consola de glitch
 const HMR_PORT= estamosEnGlitch ? 443 : null; 
 //A: En glitch hay que indicarle al navegador que se conecte al de https pubico donde se ve la pagina
@@ -17,10 +19,10 @@ export default defineConfig({
 	},
 	plugins: [
 		reactRefresh(),
-		polyfillNode(),
 	],
 	build: {
-		outDir: "build"
+		outDir: "build",
+		//rollupOptions: rollupConfig,
 	},
 	server: {
 		strictPort: true,
@@ -28,7 +30,9 @@ export default defineConfig({
 				port: HMR_PORT,
 			}
 	},
-	define: { //A: Compatibilidad node-react ej: web3
-    'process.env': {},
-  }
+	//define: { //A: Compatibilidad node-react ej: web3
+    //'process.env': {
+			//'NODE_ENV': JSON.stringify("development"),
+		//},
+  //}
 });
