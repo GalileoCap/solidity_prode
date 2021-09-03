@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { List, Container, Button, Header, Segment, Flag, Confirm } from 'semantic-ui-react'
 
 import { useWeb3React } from '@web3-react/core'
+import Web3U from 'web3-utils'
 
-import { useForceUpdate } from '../utils/utils.js'
-import { submitBets } from '../utils/web3.js'
+import { useForceUpdate, conseguirVarios } from '../utils/utils.js'
+import { submitBets, getFromContract } from '../utils/web3.js'
 
 import { games } from '../data.json'
 
@@ -19,7 +20,9 @@ function validBets(bets) { //U: Checks if the bettor picked a team on every game
 /* S: Betting UI *****************************************************/
 
 function Game({ game, y, chosenSide, onChooseTeam }) {
+	const { chainId, account, activate, active, library } = useWeb3React()
 	const [ showInfo, setShowInfo ] = useState(false)
+	const [ data, setData ] = useState({votes: [0, 0, 0]})
 
 	const shideInfo = () => { setShowInfo(!showInfo) }
 
@@ -45,17 +48,42 @@ function Game({ game, y, chosenSide, onChooseTeam }) {
 		}
 	}
 
+	const updateData = async () => {
+		const comoConseguir = {
+			votes: async () => ( (await getFromContract(['game', y], library)).votes ),
+		}
+
+		const newData = await conseguirVarios(comoConseguir, 'game updateData')
+		setData(newData)
+		console.log('game updateData done', newData)
+	}
+	useEffect(() => updateData(), [showInfo]) //TODO: There's got to be a better way
+
 	const infoComponent = () => {
 		if (showInfo) {
 			const date = game.info.date //TODO: Timezones 
 
 			return (
 				<List.Item>
-					Date: {date}
+					<List horizontal>
+						<List.Item>
+							Date: {date}
+						</List.Item>
+						<List.Item>
+							Local Votes: {Web3U.hexToNumber(data.votes[0]._hex)}
+						</List.Item>
+						<List.Item>
+							Away Votes: {Web3U.hexToNumber(data.votes[1]._hex)}
+						</List.Item>
+						<List.Item>
+							Tie Votes: {Web3U.hexToNumber(data.votes[2]._hex)}
+						</List.Item>
+					</List>
 				</List.Item>
 			)
 		}
 	}
+
 
 	return (
 		<Segment>

@@ -4,6 +4,7 @@ import { Container, Button }  from 'semantic-ui-react'
 import TopMenu from './menu/topMenu.js'
 import BottomMenu from './menu/bottomMenu.js'
 import Bettor from './bettor/bettor.js'
+import Creator from './creator/creator.js'
 
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
@@ -25,7 +26,7 @@ function MiddlePerson() { //U: Needed for activate to work
 			<TopMenu />
 			<Container text style={{ marginTop: '4em' }}>
 				{active ? 
-					<Bettor submitBets={submitBets} />
+					<Bettor />
 				: (
 					<div>
 						<h1>Wallet activation required</h1>
