@@ -59,3 +59,8 @@ export async function createContract(price, library) {
 	//const contract = await factory.deploy(games.length, price)
 	return await factory.deploy(games.length, Web3U.toWei(String(price), 'ether'))
 }
+
+export function startGames(library, address = Address) {
+	const contract = getContract(library, address)
+	contract.startGames()
+}

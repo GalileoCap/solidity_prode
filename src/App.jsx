@@ -26,7 +26,7 @@ function MiddlePerson() { //U: Needed for activate to work
 			<TopMenu />
 			<Container text style={{ marginTop: '4em' }}>
 				{active ? 
-					<Bettor />
+					<Creator />
 				: (
 					<div>
 						<h1>Wallet activation required</h1>
