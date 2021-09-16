@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Button }  from 'semantic-ui-react'
+import { Container, Button, Modal }  from 'semantic-ui-react'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 
 import TopMenu from './menu/topMenu.js'
 import BottomMenu from './menu/bottomMenu.js'
@@ -17,22 +23,24 @@ import { submitBets, injectedConnector } from './utils/web3.js'
 function MiddlePerson() { //U: Needed for activate to work
 	const { chainId, account, activate, active, library } = useWeb3React()
 
-  const onClickActivate = () => {
-    activate(injectedConnector)
+	if (!active) {
+		activate(injectedConnector)
 	}
 
 	return (
 		<div>
 			<TopMenu />
 			<Container text style={{ marginTop: '4em' }}>
-				{active ? 
-					<Creator />
-				: (
-					<div>
-						<h1>Wallet activation required</h1>
-						<Button primary onClick={onClickActivate} content='Activate' />
-					</div>
-				)}
+				<Bettor />
+		
+				<Modal size='tiny' open={!active}>
+					<Modal.Header content='Wallet Activation Required' />
+					<Modal.Content>
+						<p>You need to activate your crypto wallet.</p>
+						<p>Right now we're only working with MetaMask, but more are coming!</p>
+						<p>If you didn't get a popup <Button secondary onClick={() => activate(injectedConnector)} content='click me'/></p>
+					</Modal.Content>
+				</Modal>
 			</Container>
 			<BottomMenu />
 		</div>
