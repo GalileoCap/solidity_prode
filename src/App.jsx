@@ -62,7 +62,6 @@ function MiddlePerson() { //U: Needed for activate to work
 					</Modal.Content>
 				</Modal>
 			</Container>
-			<BottomMenu />
 		</div>
 	)
 }
