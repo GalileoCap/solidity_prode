@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Button, Modal }  from 'semantic-ui-react'
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
-} from "react-router-dom"
 
 import TopMenu from './menu/topMenu.js'
 import BottomMenu from './menu/bottomMenu.js'
+import Landing from './landing.js'
 import Bettor from './bettor/bettor.js'
 import Creator from './creator/creator.js'
 
@@ -17,19 +12,13 @@ import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
 
 import { submitBets, injectedConnector } from './utils/web3.js'
+import { parseUrl } from './utils/urls.js'
 
 /* S: UI Manager ********************************************/
 
-function Landing() {
-	return (
-		<Container>
-			TODO: Landing page
-		</Container>
-	)
-}
-
 function MiddlePerson() { //U: Needed for activate to work
 	const { chainId, account, activate, active, library } = useWeb3React()
+	const { path } = parseUrl(window.location)
 
 	if (!active) {
 		activate(injectedConnector)
@@ -39,19 +28,9 @@ function MiddlePerson() { //U: Needed for activate to work
 		<div>
 			<TopMenu />
 			<Container text style={{ marginTop: '4em' }}>
-				<Router>
-					<Switch>
-						<Route path='/GaliProde/current'>
-							<Bettor />
-						</Route>
-						<Route path='/GaliProde/creator'>
-							<Creator />
-						</Route>
-						<Route path='*'>
-							<Landing />
-						</Route>
-					</Switch>
-				</Router>
+				{path[1] == 'current' ? <Bettor />
+				 : (path[1] == 'create' ? <Creator />
+				 : <Landing />)}
 		
 				<Modal size='tiny' open={!active}>
 					<Modal.Header content='Wallet Activation Required' />
