@@ -5,7 +5,7 @@ import {
   Switch,
   Route,
   Link
-} from "react-router-dom";
+} from "react-router-dom"
 
 import TopMenu from './menu/topMenu.js'
 import BottomMenu from './menu/bottomMenu.js'
@@ -20,6 +20,14 @@ import { submitBets, injectedConnector } from './utils/web3.js'
 
 /* S: UI Manager ********************************************/
 
+function Landing() {
+	return (
+		<Container>
+			TODO: Landing page
+		</Container>
+	)
+}
+
 function MiddlePerson() { //U: Needed for activate to work
 	const { chainId, account, activate, active, library } = useWeb3React()
 
@@ -31,7 +39,19 @@ function MiddlePerson() { //U: Needed for activate to work
 		<div>
 			<TopMenu />
 			<Container text style={{ marginTop: '4em' }}>
-				<Bettor />
+				<Router>
+					<Switch>
+						<Route path='/GaliProde/current'>
+							<Bettor />
+						</Route>
+						<Route path='/GaliProde/creator'>
+							<Creator />
+						</Route>
+						<Route path='*'>
+							<Landing />
+						</Route>
+					</Switch>
+				</Router>
 		
 				<Modal size='tiny' open={!active}>
 					<Modal.Header content='Wallet Activation Required' />

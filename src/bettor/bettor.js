@@ -10,7 +10,7 @@ import Betting from './betting.js'
 import Managing from './managing.js'
 
 export default function Bettor() {
-	const { chainId, account, activate, active, library } = useWeb3React()
+	const { account, active, library } = useWeb3React()
 
 	const [data, setData] = useState({bettor: undefined, started: false, done:false})
 
@@ -21,9 +21,13 @@ export default function Bettor() {
 			done: async () => ( await getFromContract(['done'], library) )
 		}
 
-		const newData = await conseguirVarios(comoConseguir, 'bettor updateData')
-		setData(newData)
-		console.log('bettor updateData done', newData)
+		if (active) { //A: The first time that it loads, account is undefined before activating
+			const newData = await conseguirVarios(comoConseguir, 'bettor updateData')
+			setData(newData)
+			console.log('bettor updateData done', newData)
+		} else {
+			console.error('bettor not active')
+		}
 	}
 
 	useEffect(() => { updateData() }, [account])
