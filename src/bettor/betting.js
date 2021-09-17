@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { List, Container, Button, Header, Segment, Flag, Confirm } from 'semantic-ui-react'
+import { Menu, Icon, List, Container, Button, Header, Segment, Confirm, Sidebar } from 'semantic-ui-react'
 
 import { useWeb3React } from '@web3-react/core'
 import Web3U from 'web3-utils'
@@ -7,109 +7,10 @@ import Web3U from 'web3-utils'
 import { useForceUpdate, conseguirVarios } from '../utils/utils.js'
 import { submitBets, getFromContract } from '../utils/web3.js'
 
-import { games } from '../data.json'
-
-/* S: API ************************************************************/
-
-function validBets(bets) { //U: Checks if the bettor picked a team on every game
-	let res = true
-	for (const bet of bets) { res &= 0 <= bet && bet <= 2 }
-	return res
-}
+import Map from '../map/map.js'
+import { provinces } from '../data.json'
 
 /* S: Betting UI *****************************************************/
-
-function Game({ game, y, chosenSide, onChooseTeam }) {
-	const { chainId, account, activate, active, library } = useWeb3React()
-	const [ showInfo, setShowInfo ] = useState(false)
-	const [ data, setData ] = useState({votes: [0, 0, 0]})
-
-	const shideInfo = () => { setShowInfo(!showInfo) }
-
-	const buttonSideComponent = (side) => {
-		const team = side == 0 ? game.local : game.away
-		const text = <div><Flag name={team.toLowerCase()} />{team}</div>
-		const color = side == chosenSide ? 'green' : 'red'
-
-		if (chosenSide != -1) {
-			return <Button color={color} onClick={() => onChooseTeam(y, side)} content={text} />
-		} else {
-			return <Button onClick={() => onChooseTeam(y, side)} content={text} />
-		}
-	}
-
-	const buttonTieComponent = () => {
-		const text = 'Tie'
-
-		if (chosenSide == 2) {
-			return <Button color="grey" onClick={() => onChooseTeam(y, 2)} content={text} />
-		} else {
-			return <Button onClick={() => onChooseTeam(y, 2)} content={text} />
-		}
-	}
-
-	const updateData = async () => {
-		const comoConseguir = {
-			votes: async () => ( (await getFromContract(['game', y], library)).votes ),
-		}
-
-		const newData = await conseguirVarios(comoConseguir, 'game updateData')
-		setData(newData)
-		console.log('game updateData done', newData)
-	}
-	useEffect(() => updateData(), [showInfo]) //TODO: There's got to be a better way
-
-	const infoComponent = () => {
-		if (showInfo) {
-			const date = game.info.date //TODO: Timezones 
-
-			return (
-				<List.Item>
-					<List horizontal>
-						<List.Item>
-							Date: {date}
-						</List.Item>
-						<List.Item>
-							Local Votes: {Web3U.hexToNumber(data.votes[0]._hex)}
-						</List.Item>
-						<List.Item>
-							Away Votes: {Web3U.hexToNumber(data.votes[1]._hex)}
-						</List.Item>
-						<List.Item>
-							Tie Votes: {Web3U.hexToNumber(data.votes[2]._hex)}
-						</List.Item>
-					</List>
-				</List.Item>
-			)
-		}
-	}
-
-
-	return (
-		<Segment>
-			<List>
-				<List.Item>
-					<List horizontal>
-						<List.Item>
-							<Button.Group size="big">
-								{buttonSideComponent(0)}
-								<Button.Or text="vs." />
-								{buttonSideComponent(1)}
-							</Button.Group>
-						</List.Item>
-						<List.Item>
-							{buttonTieComponent()}
-						</List.Item>
-							<Button size="small" onClick={shideInfo} content='Show Info' />
-						<List.Item>
-						</List.Item>
-					</List>
-				</List.Item>
-				{infoComponent()}
-			</List>
-		</Segment>
-	)
-}
 
 function BetsList({ bets }) {
 	return (
@@ -128,16 +29,49 @@ function BetsList({ bets }) {
 	)
 }
 
+function Side({ id, chosenSide, onChooseSide }) {
+	const data = provinces[id - 1]
+
+	const getButtonColor = (side) => {
+		return chosenSide ? (chosenSide == side ? 'green' : 'red') : 'grey'
+	}
+
+	if (!id) {
+		return <Header as='h2' inverted style={{margin: '0.3em'}} content='Clickeá en una provincia' />
+	} else {
+		return (
+			<>
+				<Header as='h2' inverted style={{margin: '0.3em'}} content={data.name} />
+				{data.sides.map(side => (
+					<Button
+						key={side}
+						onClick={() => {onChooseSide(id, side)} }
+						color={getButtonColor(side)}
+						style={{marginTop: '0.5em'}}
+						content={side} />
+				))}
+			</>
+		)
+	}
+}
+
 export default function Betting() {
 	const { chainId, account, activate, active, library } = useWeb3React()
-
-	const [ bets, setBets ] = useState(Array(games.length).fill(-1))
+	const [ bets, setBets ] = useState(Array(provinces.length).fill(undefined))
 	const forceUpdate = useForceUpdate() 
 	
-	const onChooseTeam = (game, side) => {
-		console.log('Chose game side bets', game, side, bets)
+	const [ province, setProvince ] = useState(undefined)
+
+	const onClickProvince = (gprops) => {
+		const { ID_1: id, NAME_1: name } = gprops
+		console.log('onClickProvince id name', id, name)
+		setProvince(id)
+	}
+
+	const onChooseSide = (id, side) => {
+		console.log('onChooseSide', id, side, bets)
 		const newBets = bets
-		newBets[game] = side
+		newBets[id - 1] = side
 		setBets(newBets)
 		forceUpdate()
 	}
@@ -162,12 +96,26 @@ export default function Betting() {
 
 	return (
 		<Container>
-			<Header as='h1'>Pick your winners</Header>
-			<Container>
-				{games.map((game, y) => (
-					<Game key={y} game={game} y={y} chosenSide={bets[y]} onChooseTeam={onChooseTeam}/>
-				))}
-			</Container>
+			<Sidebar.Pushable>
+				<Sidebar
+					as={Menu}
+					animation='overlay'
+					icon='labeled'
+					inverted
+					visible
+					vertical
+					width='thin'
+				>
+					<Side id={province} chosenSide={bets[province - 1]} onChooseSide={onChooseSide} />
+				</Sidebar>
+
+				<Sidebar.Pusher>
+					<Segment basic>
+						<Map onClickProvince={onClickProvince} bets={bets} />
+					</Segment>
+				</Sidebar.Pusher>
+			</Sidebar.Pushable>
+
 			<Button primary onClick={onClickSubmit} content='Submit' style={{ marginTop: '1.5em' }}/>
 			<Confirm open={popup} onConfirm={() => submitBets(bets, library)} onCancel={onClickCancel}
 				header="Are you sure?"

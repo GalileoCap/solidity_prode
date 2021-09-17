@@ -1,9 +1,29 @@
 {
 	"address": "0x8F65379DA5db5ADacA039601EDc41fA70337172c",
-	"games": [
-		{"local": "Kazakhstan", "away": "Ukraine", "info": { "date": "2021-09-01T11" }},
-    {"local": "Malta", "away": "Cyprus", "info": { "date": "2021-09-01T15:45" }},
-    {"local": "Faroe Islands", "away": "Israel", "info": { "date": "2021-09-01T15:45" }},
-    {"local": "Moldova", "away": "Austria", "info": { "date": "2021-09-01T15:45" }}
+	"provinces": [
+		{"id":1, "name":"Buenos Aires", "sides":["rojo", "verde", "violeta"]},
+		{"id":2, "name":"Córdoba", "sides":["rojo", "verde", "violeta"]},
+		{"id":3, "name":"Catamarca", "sides":["rojo", "verde", "violeta"]},
+		{"id":4, "name":"Chaco", "sides":["rojo", "verde", "violeta"]},
+		{"id":5, "name":"Chubut", "sides":["rojo", "verde", "violeta"]},
+		{"id":6, "name":"Ciudad de Buenos Aires", "sides":["rojo", "verde", "violeta"]},
+		{"id":7, "name":"Corrientes", "sides":["rojo", "verde", "violeta"]},
+		{"id":8, "name":"Entre Ríos", "sides":["rojo", "verde", "violeta"]},
+		{"id":9, "name":"Formosa", "sides":["rojo", "verde", "violeta"]},
+		{"id":10, "name":"Jujuy", "sides":["rojo", "verde", "violeta"]},
+		{"id":11, "name":"La Pampa", "sides":["rojo", "verde", "violeta"]},
+		{"id":12, "name":"La Rioja", "sides":["rojo", "verde", "violeta"]},
+		{"id":13, "name":"Mendoza", "sides":["rojo", "verde", "violeta"]},
+		{"id":14, "name":"Misiones", "sides":["rojo", "verde", "violeta"]},
+		{"id":15, "name":"Neuquén", "sides":["rojo", "verde", "violeta"]},
+		{"id":16, "name":"Río Negro", "sides":["rojo", "verde", "violeta"]},
+		{"id":17, "name":"Salta", "sides":["rojo", "verde", "violeta"]},
+		{"id":18, "name":"San Juan", "sides":["rojo", "verde", "violeta"]},
+		{"id":19, "name":"San Luis", "sides":["rojo", "verde", "violeta"]},
+		{"id":20, "name":"Santa Cruz", "sides":["rojo", "verde", "violeta"]},
+		{"id":21, "name":"Santa Fe", "sides":["rojo", "verde", "violeta"]},
+		{"id":22, "name":"Santiago del Estero", "sides":["rojo", "verde", "violeta"]},
+		{"id":23, "name":"Tierra del Fuego", "sides":["rojo", "verde", "violeta"]},
+		{"id":24, "name":"Tucumán", "sides":["rojo", "verde", "violeta"]}
 	]
 }

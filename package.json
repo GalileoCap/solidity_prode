@@ -46,6 +46,7 @@
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.2.0",
     "react-semantic-ui": "^0.2.0",
+    "react-simple-maps": "^2.3.0",
     "react-spring": "^9.1.2",
     "react-syntax-highlighter": "^15.4.3",
     "redux": "^4.1.0",
