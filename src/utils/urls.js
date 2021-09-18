@@ -12,5 +12,6 @@ export function parseUrl(loc) {
 export function setPath(to, keep = 1) { 
 	const { path } = parseUrl(window.location)
 
+	console.log(`/${path.slice(0, keep).join('/')}/${to}`)
 	window.location = `/${path.slice(0, keep).join('/')}/${to}`
 }

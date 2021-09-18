@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Button, Modal }  from 'semantic-ui-react'
 
-import TopMenu from './menu/topMenu.js'
-import BottomMenu from './menu/bottomMenu.js'
+import Banner from './banner.js'
 import Landing from './landing.js'
 import Bettor from './bettor/bettor.js'
 import Creator from './creator/creator.js'
@@ -19,29 +18,27 @@ import { parseUrl } from './utils/urls.js'
 function MiddlePerson() { //U: Needed for activate to work
 	const { chainId, account, activate, active, library } = useWeb3React()
 	const { path } = parseUrl(window.location)
+	const needToActivate = (path[1] == 'current' || path[1] == 'create') && !active
 
-	if (!active) {
+	if (needToActivate) {
 		activate(injectedConnector)
 	}
 
 	return (
-		<div>
-			<TopMenu />
-			<Container text style={{ marginTop: '4em' }}>
-				{path[1] == 'current' ? <Bettor />
-				 : (path[1] == 'create' ? <Creator />
-				 : <Landing />)}
-		
-				<Modal size='tiny' open={!active}>
-					<Modal.Header content='Wallet Activation Required' />
-					<Modal.Content>
-						<p>You need to activate your crypto wallet.</p>
-						<p>Right now we're only working with MetaMask, but more are coming!</p>
-						<p>If you didn't get a popup <Button secondary onClick={() => activate(injectedConnector)} content='click me'/></p>
-					</Modal.Content>
-				</Modal>
+		<>
+			<Banner />
+			<Container fluid>
+				 <Landing />
 			</Container>
-		</div>
+			<Modal size='tiny' open={needToActivate}>
+				<Modal.Header content='Wallet Activation Required' />
+				<Modal.Content>
+					<p>You need to activate your crypto wallet.</p>
+					<p>Right now we're only working with MetaMask, but more are coming!</p>
+					<p>If you didn't get a popup <Button secondary onClick={() => activate(injectedConnector)} content='click me'/></p>
+				</Modal.Content>
+			</Modal>
+		</>
 	)
 }
 
@@ -53,10 +50,10 @@ export default function App() {
 	}
 
   return (
-		<div style={{textAlign: 'center'}}>
+		<>
 			<Web3ReactProvider getLibrary={getLibrary}>
 				<MiddlePerson />
 			</Web3ReactProvider>
-		</div>
+		</>
   )
 }
