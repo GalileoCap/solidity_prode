@@ -32,7 +32,7 @@ function Party({ party, pct }) {
 	)
 }
 
-function Fichas({ fichas, setFichas }) {
+function Fichas({ fichas, setFichas, only }) {
 	const masMenos = (lado) => {
 		const newFichas = fichas + lado
 		if (newFichas > 0) {
@@ -41,7 +41,7 @@ function Fichas({ fichas, setFichas }) {
 	}
 
 	return (
-		<Grid.Column>
+		<Grid.Column only={only}>
 			<List horizontal>
 				<List.Item>
 					<Button secondary content='-' onClick={() => masMenos(-1) } />
@@ -85,8 +85,9 @@ export default function Submit({ province, bets, fichas, setFichas, setPath }) {
 			<Header as='h1' content='Confirmá tus apuestas' />
 			<Grid stackable>
 				<Grid.Row columns={2}>
-					<Fichas fichas={fichas} setFichas={setFichas} />
+					<Fichas fichas={fichas} setFichas={setFichas} only='computer tablet' />
 					<ButtonSubmit onClickSubmit={onClickSubmit} />
+					<Fichas fichas={fichas} setFichas={setFichas} only='mobile' />
 				</Grid.Row>
 			</Grid>
 
