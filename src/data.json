@@ -1,9 +1,6 @@
 {
-	"address": "0x8F65379DA5db5ADacA039601EDc41fA70337172c",
-	"games": [
-		{"local": "Kazakhstan", "away": "Ukraine", "info": { "date": "2021-09-01T11" }},
-    {"local": "Malta", "away": "Cyprus", "info": { "date": "2021-09-01T15:45" }},
-    {"local": "Faroe Islands", "away": "Israel", "info": { "date": "2021-09-01T15:45" }},
-    {"local": "Moldova", "away": "Austria", "info": { "date": "2021-09-01T15:45" }}
-	]
+	"address": "0xCfEB869F69431e42cdB54A4F4f105C19C080A601",
+	"provinces": {
+		"Buenos Aires": ["juntos", "todes", "izquierda"]
+	}
 }

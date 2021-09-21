@@ -8,7 +8,7 @@ import Web3U from 'web3-utils'
 window.Web3U = Web3U
 
 import Wager from '../contracts/Wager.json'
-import { address as Address, games } from '../data.json'
+import { address as Address, provinces } from '../data.json'
 
 export const injectedConnector = new InjectedConnector({
   supportedChainIds: [
