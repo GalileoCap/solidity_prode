@@ -1,11 +1,6 @@
-@font-face {
-	font-family: 'Alpha Slab One';
-	src: url('../resources/AlfaSlabOne-Regular.ttf') format('truetype');
-}
-@font-face {
-	font-family: 'Ultra';
-	src: url('../resources/Ultra-Regular.ttf') format('truetype');
-}
+@font-face { font-family: 'Alpha Slab One'; src: url('../resources/AlfaSlabOne-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'Ultra'; src: url('../resources/Ultra-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'Anton'; src: url('../resources/Anton-Regular.ttf') format('truetype'); }
 
 body {
   margin: 0;
