@@ -22,7 +22,7 @@ function ComoSeJuega({ setPath, only }) {
 					Elegí cuántas fichas querés comprar
 				</List.Item>
 				<List.Item>
-					<Button primary onClick={() => setPath(['elecciones'])} style={{marginTop: '1em'}} content='Apostá ahora y ganá!' />
+					<Button primary onClick={() => setPath(['elecciones', 'betting'])} style={{marginTop: '1em'}} content='Apostá ahora y ganá!' />
 				</List.Item>
 			</List>
 		</Grid.Column>
@@ -35,7 +35,7 @@ function Apostar({ setPath }) {
 			<Image src='./src/landing/betting.jpg' />
 			<Button color='red'
 				style={{position: 'absolute', width: '40%', marginLeft: '29%', heigth: '15%', marginTop: '30%'}}
-				onClick={() => setPath(['elecciones'])}
+				onClick={() => setPath(['elecciones', 'betting'])}
 				content='Apostar Ahora!'
 			/>
 		</Grid.Column>

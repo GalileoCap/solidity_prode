@@ -3,7 +3,7 @@ import { Container, Button, Modal }  from 'semantic-ui-react'
 
 import Banner from './menu/banner.js'
 import Landing from './landing/landing.js'
-import Betting from './betting/betting.js'
+import Bettor from './betting/bettor.js'
 //import Creator from './creator/creator.js'
 
 import { Web3ReactProvider } from '@web3-react/core'
@@ -17,10 +17,10 @@ import { parseUrl } from './utils/urls.js'
 
 function MiddlePerson() { //U: Needed for activate to work
 	const { activate, active } = useWeb3React()
+	const [askActivate, setAskActivate] = useState(false)
 	const [path, setPath] = useState([''])
-	const needToActivate = (path[0] == 'elecciones' || path[0] == 'create') && !active
 
-	if (needToActivate) {
+	if (askActivate && !active) {
 		activate(injectedConnector)
 	}
 
@@ -28,10 +28,10 @@ function MiddlePerson() { //U: Needed for activate to work
 		<>
 			<Banner setPath={setPath} />
 			<Container fluid>
-				{ path[0] == 'elecciones' ? <Betting /> :
+				{ path[0] == 'elecciones' ? <Bettor path={path} setPath={setPath} askActivate={askActivate} /> :
 				 <Landing setPath={setPath} /> }
 			</Container>
-			<Modal size='tiny' open={needToActivate}>
+			<Modal size='tiny' open={askActivate && !active}>
 				<Modal.Header content='Wallet Activation Required' />
 				<Modal.Content>
 					<p>You need to activate your crypto wallet.</p>
