@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Button, Modal }  from 'semantic-ui-react'
 
-import Banner from './banner.js'
-import Landing from './landing.js'
-import Bettor from './bettor/bettor.js'
-import Creator from './creator/creator.js'
+import Banner from './menu/banner.js'
+import Landing from './landing/landing.js'
+import Betting from './betting/betting.js'
+//import Creator from './creator/creator.js'
 
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
@@ -16,9 +16,9 @@ import { parseUrl } from './utils/urls.js'
 /* S: UI Manager ********************************************/
 
 function MiddlePerson() { //U: Needed for activate to work
-	const { chainId, account, activate, active, library } = useWeb3React()
-	const { path } = parseUrl(window.location)
-	const needToActivate = (path[1] == 'current' || path[1] == 'create') && !active
+	const { activate, active } = useWeb3React()
+	const [path, setPath] = useState([''])
+	const needToActivate = (path[0] == 'elecciones' || path[0] == 'create') && !active
 
 	if (needToActivate) {
 		activate(injectedConnector)
@@ -26,9 +26,10 @@ function MiddlePerson() { //U: Needed for activate to work
 
 	return (
 		<>
-			<Banner />
+			<Banner setPath={setPath} />
 			<Container fluid>
-				 <Landing />
+				{ path[0] == 'elecciones' ? <Betting /> :
+				 <Landing setPath={setPath} /> }
 			</Container>
 			<Modal size='tiny' open={needToActivate}>
 				<Modal.Header content='Wallet Activation Required' />

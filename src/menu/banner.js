@@ -1,11 +1,9 @@
 import React from 'react'
 import { Menu, Header } from 'semantic-ui-react'
 
-import { setPath } from './utils/urls.js'
-
 /* S: UI *************************************************************/
 
-export default function Banner() {
+export default function Banner({ setPath }) {
 	//TODO: Image
 	
 	return (

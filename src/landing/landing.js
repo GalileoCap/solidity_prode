@@ -4,8 +4,6 @@ import { Container, Header, Grid, List, Image, Button }  from 'semantic-ui-react
 import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
 
-import { setPath } from '../utils/urls.js'
-
 function ComoSeJuega({ only }) {
 	//TODO: Font for the step numbers
 	return (
@@ -31,13 +29,13 @@ function ComoSeJuega({ only }) {
 	)
 }
 
-function Apostar() {
+function Apostar({ setPath }) {
 	return (
 		<Grid.Column width={8} style={{display: 'flex', alignItems: 'center'}}> 
 			<Image src='./src/landing/betting.jpg' />
 			<Button color='red'
 				style={{position: 'absolute', width: '40%', marginLeft: '29%', heigth: '15%', marginTop: '30%'}}
-				onClick={() => setPath('elecciones')}
+				onClick={() => setPath(['elecciones'])}
 				content='Apostar Ahora!'
 			/>
 		</Grid.Column>
@@ -54,7 +52,7 @@ function VideoExplicativo() {
 	)
 }
 
-export default function Landing() {
+export default function Landing({ setPath }) {
 	const totalPool = 1936753 //TODO: Get pool from contract
 
 	return (
@@ -65,7 +63,7 @@ export default function Landing() {
 			<Grid rows={2} stackable style={{marginLeft: '2em', marginRight: '2em'}}>
 				<Grid.Row columns={2}>
 					<ComoSeJuega only='computer tablet' />
-					<Apostar />
+					<Apostar setPath={setPath} />
 					<ComoSeJuega only='mobile' />
 				</Grid.Row>
 				<VideoExplicativo />
