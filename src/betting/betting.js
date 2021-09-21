@@ -40,29 +40,10 @@ function Party({ party, y, pct, setPct }) {
 	)
 }
 
-function BetsList({ bets }) {
-	return (
-		<div className="content">
-			<List>
-				{games.map((game, y) => (
-					<List.Item key={y}>
-						<List.Header>{game.local} vs. {game.away}</List.Header>
-						<List.Description>
-							{bets[y] == 0 ? game.local : (bets[y] == 1 ? game.away : 'Tie')}
-						</List.Description>
-					</List.Item>
-				))}
-			</List>
-		</div>
-	)
-}
-
-export default function BettingUi({ province }) {
+export default function BettingUi({ province, bets, setBets, setPath }) {
 	const { library } = useWeb3React()
 	const parties = provinces[province]
 
-	const [ bets, setBets ] = useState(Array(parties.length).fill(Math.floor(100 / parties.length)))
-	
 	const setPct = (y, pct, setError) => {
 		console.log('Chose game side bets', y, pct, bets)
 		if (0 <= pct && pct <= 100) {
@@ -71,28 +52,9 @@ export default function BettingUi({ province }) {
 			const newBets = bets
 			newBets[y] = pct
 			setBets(newBets)
-			//forceUpdate()
 		} else {
 			setError(true)
 		}
-	}
-
-	const [ popup, setPopup ] = useState(false)
-
-	const onClickSubmit = () => {
-		console.log('onSubmitBets bets', bets)
-		if (validBets(bets)) {
-			console.log('onSubmitBets valid bets')
-			setPopup(true)
-		} else {
-			console.log('onSubmitBets invalid bets')
-			//TODO: Tell the bettor
-		}
-	}
-
-	const onClickCancel = () => {
-		console.log('onClickCancel')
-		setPopup(false)
 	}
 
 	return (
@@ -103,11 +65,7 @@ export default function BettingUi({ province }) {
 					<Party key={y} party={party} y={y} pct={bets[y]} setPct={setPct}/>
 				))}
 			</Grid>
-			<Button primary onClick={onClickSubmit} content='Submit' style={{ marginTop: '1.5em' }}/>
-			<Confirm open={popup} onConfirm={() => submitBets(bets, library)} onCancel={onClickCancel}
-				header="Are you sure?"
-				content={<BetsList bets={bets} />}
-			/>	
+			<Button primary onClick={() => setPath(['elecciones', 'submit']) } content='Submit' style={{ marginTop: '1.5em' }}/>
 		</Container>
 	)
 }

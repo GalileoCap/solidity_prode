@@ -4,8 +4,11 @@ import { Container }  from 'semantic-ui-react'
 import { useWeb3React } from '@web3-react/core'
 
 import Betting from './betting.js'
+import Submit from './submit.js'
 
 import { conseguirVarios } from '../utils/utils.js'
+
+import { provinces } from '../data.json'
 
 /* S: API ************************************************************/
 
@@ -16,9 +19,12 @@ function validBets(bets) { //U: Checks if the bettor picked a team on every game
 }
 
 /* S: Betting UI *****************************************************/
-
-export default function Bettor({ path, setPath, askActivate }) {
+	
+export default function Bettor({ path, setPath, province }) {
 	const { account, active, library } = useWeb3React()
+
+	const parties = provinces[province]
+	const [ bets, setBets ] = useState(Array(parties.length).fill(Math.floor(100 / parties.length)))
 
 	const [data, setData] = useState({bettor: undefined, started: false, done:false})
 
@@ -43,6 +49,10 @@ export default function Bettor({ path, setPath, askActivate }) {
 		//TODO: send to manage or tell them they're late
 
 	if (path[1] == 'betting') {
-		return <Betting province='Buenos Aires' />
+		return <Betting province={province} bets={bets} setBets={setBets} setPath={setPath} />
+	} else if (path[1] == 'submit') {
+		return <Submit province={province} bets={bets} />
+	} else {
+		<Container />
 	}
 }

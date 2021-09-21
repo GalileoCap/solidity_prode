@@ -5,8 +5,6 @@ import { InjectedConnector } from '@web3-react/injected-connector'
 import { Contract, ContractFactory } from "@ethersproject/contracts"
 import Web3U from 'web3-utils'
 
-window.Web3U = Web3U
-
 import Wager from '../contracts/Wager.json'
 import { address as Address, provinces } from '../data.json'
 
@@ -54,10 +52,9 @@ export function getFromContract(args, library, address = Address) {
 	else { console.error('getFromContract invalid arguments', args) }
 }
 
-export async function createContract(price, library) {
+export async function createContract(province, price, library) {
 	const factory = new ContractFactory(Wager.abi, Wager.bytecode, library.getSigner())
-	//const contract = await factory.deploy(games.length, price)
-	return await factory.deploy(games.length, Web3U.toWei(String(price), 'ether'))
+	return await factory.deploy(provinces[province].length, Web3U.toWei(String(price), 'ether'))
 }
 
 export function startGames(library, address = Address) {
