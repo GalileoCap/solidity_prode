@@ -6,6 +6,7 @@ import { useWeb3React } from '@web3-react/core'
 import Betting from './betting.js'
 import Submit from './submit.js'
 import Receipt from './receipt.js'
+import ClaimPrize from './claimPrize.js'
 
 import { conseguirVarios } from '../utils/utils.js'
 
@@ -56,6 +57,8 @@ export default function Bettor({ path, setPath, province }) {
 		return <Submit province={province} bets={bets} fichas={fichas} setFichas={setFichas} setPath={setPath} />
 	} else if (path[1] == 'receipt') {
 		return <Receipt province={province} fichas={fichas} bets={bets} setPath={setPath} />
+	} else if (path[1] == 'claimPrize') {
+		return <ClaimPrize setPath={setPath} />
 	} else {
 		return <Container />
 	}
