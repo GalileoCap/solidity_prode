@@ -5,6 +5,7 @@ import { useWeb3React } from '@web3-react/core'
 
 import Betting from './betting.js'
 import Submit from './submit.js'
+import Receipt from './receipt.js'
 
 import { conseguirVarios } from '../utils/utils.js'
 
@@ -25,6 +26,7 @@ export default function Bettor({ path, setPath, province }) {
 
 	const parties = provinces[province]
 	const [ bets, setBets ] = useState(Array(parties.length).fill(Math.floor(100 / parties.length)))
+	const [fichas, setFichas] = useState(1)
 
 	const [data, setData] = useState({bettor: undefined, started: false, done:false})
 
@@ -51,8 +53,10 @@ export default function Bettor({ path, setPath, province }) {
 	if (path[1] == 'betting') {
 		return <Betting province={province} bets={bets} setBets={setBets} setPath={setPath} />
 	} else if (path[1] == 'submit') {
-		return <Submit province={province} bets={bets} />
+		return <Submit province={province} bets={bets} fichas={fichas} setFichas={setFichas} setPath={setPath} />
+	} else if (path[1] == 'receipt') {
+		return <Receipt province={province} fichas={fichas} bets={bets} setPath={setPath} />
 	} else {
-		<Container />
+		return <Container />
 	}
 }

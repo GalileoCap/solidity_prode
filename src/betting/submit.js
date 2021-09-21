@@ -66,7 +66,7 @@ function ButtonSubmit({ onClickSubmit }) {
 	)
 }
 
-export default function Submit({ province, bets }) {
+export default function Submit({ province, bets, fichas, setFichas, setPath }) {
 	const parties = provinces[province]
 
 	const { activate, active, library } = useWeb3React()
@@ -74,11 +74,10 @@ export default function Submit({ province, bets }) {
 		activate(injectedConnector)
 	}
 
-	const [fichas, setFichas] = useState(1)
 	const onClickSubmit = () => {
 		console.log('onSubmitBets bets', bets)
 		//TODO: Check if valid
-		submitBets(bets, library);
+		submitBets(bets, library, () => setPath(['elecciones', 'receipt']));
 	}
 
 	return (

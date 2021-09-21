@@ -24,11 +24,11 @@ function getContract(library, address = Address) {
 	return new Contract(address, Wager.abi, library.getSigner())
 }
 
-export function submitBets(bets, library, address = Address) {
+export function submitBets(bets, library, callback = () => {}, address = Address) {
 	const contract = getContract(library)
 	getFromContract(['price'], library, address).then(price => {
 		contract.placeBet(bets, { value: price })
-			.then(x => console.log('submitBets DONE'))
+			.then(callback)
 			.catch(err => console.error('submitBets', address, err))
 	})
 }
