@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { List, Container, Button, Header, Input, Grid, Modal } from 'semantic-ui-react'
+import { Slider } from '@mui/material'
 
 import { useWeb3React } from '@web3-react/core'
 import Web3U from 'web3-utils'
@@ -10,6 +11,8 @@ import { submitBets, injectedConnector } from '../utils/web3.js'
 import { provinces } from '../data.json'
 
 function Party({ party, pct }) {
+	const sliderComponent = <Slider value={pct} disabled />
+
 	return (
 		<>
 			<Grid.Row style={{marginTop: '1.5em'}}>
@@ -17,15 +20,15 @@ function Party({ party, pct }) {
 					<Header as='h2' content={party} />
 				</Grid.Column>
 				<Grid.Column computer={5} mobile={9} color='grey'>
-					{pct}%
+					<Header inverted as='h3'>{pct}%</Header>
 				</Grid.Column>
 				<Grid.Column only='computer' width={8} color='green'>
-					TODO: Slider
+					{sliderComponent}
 				</Grid.Column>
 			</Grid.Row>
 			<Grid.Row only='tablet mobile' color='green' columns={1}>
 				<Grid.Column width={16}>
-					TODO: Slider
+					{sliderComponent}
 				</Grid.Column>
 			</Grid.Row>
 		</>
@@ -35,7 +38,9 @@ function Party({ party, pct }) {
 function ReceiptInfo({ fichas }) {
 	return (
 		<Grid.Column>
-			Se guardaró tu apuesta por {fichas} fichas
+			<Header as='h3'>
+				Se guardaró tu apuesta por {fichas} fichas
+			</Header>
 		</Grid.Column>
 	)
 }
