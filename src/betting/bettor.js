@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Container }  from 'semantic-ui-react'
+import { Box, Stepper, Step, StepLabel } from '@mui/material'
 
 import { useWeb3React } from '@web3-react/core'
 
@@ -47,19 +48,32 @@ export default function Bettor({ path, setPath, province }) {
 		}
 	}
 
-	//useEffect(() => { updateData() }, [account])
-	//if (data.bettor.voted || data.started || data.done) {
-		//TODO: send to manage or tell them they're late
+	const steps = ['betting', 'submit', 'receipt', 'claimPrize']
+	const stepLabels = ['Prepará tus apuestas', 'Confirmalas', 'Recibo', '¡Retirá tus premios!']
+	const activeStep = steps.indexOf(path[1])
 
-	if (path[1] == 'betting') {
-		return <Betting province={province} bets={bets} setBets={setBets} setPath={setPath} />
-	} else if (path[1] == 'submit') {
-		return <Submit province={province} bets={bets} fichas={fichas} setFichas={setFichas} setPath={setPath} />
-	} else if (path[1] == 'receipt') {
-		return <Receipt province={province} fichas={fichas} bets={bets} setPath={setPath} />
-	} else if (path[1] == 'claimPrize') {
-		return <ClaimPrize setPath={setPath} />
-	} else {
-		return <Container />
-	}
+	return (
+		<>
+			<Container>
+				{activeStep == 0 ?
+					<Betting province={province} bets={bets} setBets={setBets} setPath={setPath} />
+				: (activeStep == 1 ?
+					<Submit province={province} bets={bets} fichas={fichas} setFichas={setFichas} setPath={setPath} />
+				: (activeStep == 2 ?
+					<Receipt province={province} fichas={fichas} bets={bets} setPath={setPath} />
+				: (activeStep == 3 ?
+						<ClaimPrize setPath={setPath} />
+				: <Container />)))}
+			</Container>
+			<Box sx={{ width: '100%', marginTop: '3em' }} >
+				<Stepper activeStep={activeStep} alternativeLabel>
+					{steps.map((step, x) => (
+						<Step key={step}>
+							<StepLabel>{stepLabels[x]}</StepLabel>
+						</Step>
+					))}
+				</Stepper>
+			</Box>
+		</>
+	)
 }
