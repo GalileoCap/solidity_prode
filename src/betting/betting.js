@@ -1,14 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import { List, Container, Button, Header, Grid, Confirm, Input } from 'semantic-ui-react'
+import { Slider } from '@mui/material'
 
 import { useWeb3React } from '@web3-react/core'
 
-import { conseguirVarios } from '../utils/utils.js'
+import { useForceUpdate, conseguirVarios } from '../utils/utils.js'
 
 import { provinces } from '../data.json'
 
 function Party({ party, y, pct, setPct }) {
 	const [error, setError] = useState(false)
+	const [value, setValue] = useState(pct)
+	const forceUpdate = useForceUpdate()
+
+	const onChange = (value) => {
+		setPct(y, parseFloat(value), setError)
+		setValue(value)
+	}
+
+	const sliderComponent = <Slider value={value} valueLabelDisplay='auto' onChange={(e, value) => onChange(value)} />
 
 	return (
 		<>
@@ -22,18 +32,18 @@ function Party({ party, y, pct, setPct }) {
 						labelPosition='right'
 						size='mini'
 						type='number'
-						placeholder={pct}
 						error={error}
-						onChange={(e, data) => setPct(y, data.value, setError)}
+						value={value}
+						onChange={(e, data) => onChange(data.value)}
 					/>
 				</Grid.Column>
 				<Grid.Column only='computer' width={8} color='green'>
-					TODO: Slider
+					{sliderComponent}
 				</Grid.Column>
 			</Grid.Row>
 			<Grid.Row only='tablet mobile' color='green' columns={1}>
 				<Grid.Column width={16}>
-					TODO: Slider
+					{sliderComponent}
 				</Grid.Column>
 			</Grid.Row>
 		</>
@@ -45,7 +55,7 @@ export default function BettingUi({ province, bets, setBets, setPath }) {
 	const parties = provinces[province]
 
 	const setPct = (y, pct, setError) => {
-		console.log('Chose game side bets', y, pct, bets)
+		//console.log('Chose game side bets', y, pct, bets)
 		if (0 <= pct && pct <= 100) {
 			setError(false)
 
@@ -65,7 +75,7 @@ export default function BettingUi({ province, bets, setBets, setPath }) {
 					<Party key={y} party={party} y={y} pct={bets[y]} setPct={setPct}/>
 				))}
 			</Grid>
-			<Button primary onClick={() => setPath(['elecciones', 'submit']) } content='Submit' style={{ marginTop: '1.5em' }}/>
+			<Button primary size='huge' onClick={() => setPath(['elecciones', 'submit']) } content='Preparar Apuesta' style={{ marginTop: '2.5em' }}/>
 		</Container>
 	)
 }
