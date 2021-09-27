@@ -9,7 +9,7 @@ export default function Banner({ setPath }) {
 	return (
 		<Menu fixed='top' widths={1} inverted size='massive' onClick={() => setPath('') }>
 			<Menu.Item>
-				<Header as='h1' inverted content='GaliProde' />
+				<Header as='h1' inverted content='(Tu Marca)' />
 			</Menu.Item>
 		</Menu>
 	)
