@@ -4,6 +4,8 @@ import { Container, Header, Grid, List, Image, Button }  from 'semantic-ui-react
 import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
 
+import betting_img from './betting.jpg'
+
 function ComoSeJuega({ setPath, only }) {
 	//TODO: Font for the step numbers
 	return (
@@ -32,7 +34,7 @@ function ComoSeJuega({ setPath, only }) {
 function Apostar({ setPath }) {
 	return (
 		<Grid.Column width={8} style={{display: 'flex', alignItems: 'center'}}> 
-			<Image src='./src/landing/betting.jpg' />
+			<Image src={betting_img} />
 			<Button color='red'
 				style={{position: 'absolute', width: '40%', marginLeft: '29%', heigth: '15%', marginTop: '30%'}}
 				onClick={() => setPath(['elecciones', 'betting'])}
