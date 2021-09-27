@@ -16,6 +16,10 @@ import { parseUrl } from './utils/urls.js'
 /* S: UI Manager ********************************************/
 
 function MiddlePerson() { //U: Needed for activate to work
+	const { activate, active, library } = useWeb3React()
+	window.web3React = useWeb3React()
+	window.injectedConnector = injectedConnector
+
 	const [path, setPath] = useState([''])
 
 	return (

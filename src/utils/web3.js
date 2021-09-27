@@ -29,8 +29,9 @@ export function submitBets(bets, library, callback = () => {}, address = Address
 	getFromContract(['price'], library, address).then(price => {
 		contract.placeBet(bets, { value: price })
 			.then(callback)
-			.catch(err => console.error('submitBets', address, err))
+			.catch(err => console.error('submitBets placeBet', address, err))
 	})
+		.catch(err => console.error('submitBets getPrice', address, err))
 }
 
 export function claimPrize(library, address = Address) {
@@ -56,6 +57,9 @@ export async function createContract(province, price, library) {
 	const factory = new ContractFactory(Wager.abi, Wager.bytecode, library.getSigner())
 	return await factory.deploy(provinces[province].length, Web3U.toWei(String(price), 'ether'))
 }
+
+window.submitBets = submitBets
+window.createContract = createContract
 
 export function startGames(library, address = Address) {
 	const contract = getContract(library, address)

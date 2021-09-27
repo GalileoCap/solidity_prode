@@ -22,3 +22,13 @@ sudo apt-get install libusb-1.0-0-dev
 ~~~
 <script>window.global = {}</script>
 ~~~
+
+## Desplegando contrato
+
+Corrés en la consola:
+~~~
+await web3React.activate()
+contract = await createContract('Buenos Aires', 0.5, web3React.library)
+~~~
+
+Cambiás en src/data.json el address a `contract.address`
